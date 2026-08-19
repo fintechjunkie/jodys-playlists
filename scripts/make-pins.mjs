@@ -146,12 +146,21 @@ function zoneBands(zone) {
 }
 
 /**
- * Mean relative luminance of a region of the already-drawn canvas, 0..1.
+ * Luminance profile of a region of the already-drawn canvas.
  *
  * Used by the blockless treatments to pick type colour from what is actually
  * behind the text, instead of laying a scrim over the photograph to force one.
+ *
+ * The mean alone is not enough, and assuming it was produced an illegible pin.
+ * A band that is pale sky on the left and dark foliage on the right averages to
+ * a comfortable mid grey, so the mean picks light ink and the first word of the
+ * headline then sets white on white. What decides legibility is how much of the
+ * band sits at each *extreme*, so that is what this measures:
+ *
+ *   tooBright — share of pixels light enough to swallow light ink
+ *   tooDark   — share of pixels dark enough to swallow dark ink
  */
-function zoneLuminance(ctx, x, y, w, h) {
+function zoneProfile(ctx, x, y, w, h) {
   const { data } = ctx.getImageData(
     Math.max(0, Math.round(x)),
     Math.max(0, Math.round(y)),
@@ -159,18 +168,54 @@ function zoneLuminance(ctx, x, y, w, h) {
     Math.max(1, Math.round(h)),
   );
   let sum = 0;
+  let bright = 0;
+  let dark = 0;
   const n = data.length / 4;
   for (let i = 0; i < data.length; i += 4) {
-    sum += (0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2]) / 255;
+    const lum = (0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2]) / 255;
+    sum += lum;
+    if (lum > BRIGHT_LIMIT) bright += 1;
+    if (lum < DARK_LIMIT) dark += 1;
   }
-  return sum / n;
+  return { mean: sum / n, tooBright: bright / n, tooDark: dark / n };
 }
 
-/** Type colours for blockless treatments, chosen against the measured backdrop. */
-function adaptiveTheme(luminance) {
-  return luminance > 0.55
-    ? { headline: C.charcoal, subline: C.forest, brand: C.magenta, rule: C.magenta }
-    : { headline: C.chalk, subline: C.chalk, brand: C.chartreuse, rule: C.chartreuse };
+/**
+ * A pixel above BRIGHT_LIMIT will not hold chalk type; one below DARK_LIMIT will
+ * not hold charcoal type. Set either way from where these photographs actually
+ * sit rather than at the midpoint, because both inks keep working a good way
+ * past 0.5 and pulling the limits in only forces needless blocks.
+ */
+const BRIGHT_LIMIT = 0.62;
+const DARK_LIMIT = 0.38;
+
+/**
+ * How much of a band may fight the chosen ink before blockless type is refused.
+ *
+ * Measured, not guessed. Across every band of every pin, the ones that read
+ * cleanly on inspection sit at 0.00-0.03 conflict. The two that did not sit at
+ * 0.22 (pale sky, gold canopy and a dark trunk in one band) and 0.42 (overcast
+ * sky beside a dark bus shelter, where the headline set white on white). Nothing
+ * real lands between 0.03 and 0.22, so the cut goes in the middle of that gap and
+ * is nowhere near either cluster.
+ *
+ * Every render prints its conflict figure, so if a future image lands in the gap
+ * the number says so instead of the pin quietly looking wrong.
+ */
+const MAX_CONFLICT = 0.1;
+
+/**
+ * Type colours for blockless treatments, chosen against the measured backdrop.
+ * Returns null when neither ink can carry the band, which is the caller's signal
+ * to fall back to a solid block. Refusing is the point: a scrim to force one ink
+ * would reintroduce the same flatness in softer form, and the design system bans
+ * gradients.
+ */
+function adaptiveTheme(profile) {
+  if (Math.min(profile.tooBright, profile.tooDark) > MAX_CONFLICT) return null;
+  return profile.tooBright <= profile.tooDark
+    ? { headline: C.chalk, subline: C.chalk, brand: C.chartreuse, rule: C.chartreuse }
+    : { headline: C.charcoal, subline: C.forest, brand: C.magenta, rule: C.magenta };
 }
 
 /**
@@ -201,6 +246,8 @@ async function renderPin(image, pin, treatment = "band") {
   const margin = Math.round(W * 0.07);
   const inner = W - margin * 2;
   const bands = zoneBands(pin.zone);
+  /** Measurements, returned so the caller can report and threshold them. */
+  const profiles = [];
   const brandSize = Math.max(12, Math.round(W * 0.022));
   const hasBlock = treatment === "band" || treatment === "tag";
 
@@ -211,12 +258,24 @@ async function renderPin(image, pin, treatment = "band") {
     const boxTop = top + padY;
     const boxHeight = height - padY * 2;
 
-    // Blockless treatments read their colours off the photograph itself.
-    const theme = hasBlock
-      ? banner
-      : adaptiveTheme(zoneLuminance(ctx, 0, top, W, height));
+    // Blockless treatments read their colours off the photograph itself, and are
+    // refused per band when the photograph cannot carry them. Per band, not per
+    // pin: a split pin's top and bottom are different pictures.
+    const profile = hasBlock ? null : zoneProfile(ctx, 0, top, W, height);
+    const adaptive = profile ? adaptiveTheme(profile) : null;
+    const effective = profile && !adaptive ? "band" : treatment;
+    const theme = adaptive ?? banner;
 
-    const ruleBlock = treatment === "rule" ? Math.round(brandSize * 1.4) : 0;
+    if (profile) {
+      profiles.push({
+        role: band.role,
+        ...profile,
+        conflict: Math.min(profile.tooBright, profile.tooDark),
+        fellBack: effective !== treatment,
+      });
+    }
+
+    const ruleBlock = effective === "rule" ? Math.round(brandSize * 1.4) : 0;
 
     if (band.role === "headline") {
       const sharesBanner = pin.zone !== "split" && Boolean(pin.copy.subline);
@@ -231,10 +290,10 @@ async function renderPin(image, pin, treatment = "band") {
 
       // Text is measured before any block is drawn, so a "tag" block can be
       // sized to the text rather than the frame.
-      if (treatment === "band") {
+      if (effective === "band") {
         ctx.fillStyle = theme.bg;
         ctx.fillRect(0, top, W, height);
-      } else if (treatment === "tag") {
+      } else if (effective === "tag") {
         const widest = Math.max(
           ...head.lines.map((l) => {
             ctx.font = `${head.fontSize}px AntonPin`;
@@ -267,7 +326,7 @@ async function renderPin(image, pin, treatment = "band") {
 
       let y = boxTop + brandBlock;
 
-      if (treatment === "rule") {
+      if (effective === "rule") {
         ctx.fillStyle = theme.rule;
         ctx.fillRect(margin, y, Math.round(W * 0.16), Math.max(3, Math.round(W * 0.008)));
         y += ruleBlock;
@@ -282,10 +341,10 @@ async function renderPin(image, pin, treatment = "band") {
         const blockH = sub.lines.length * sub.lineHeight;
         const textTop = boxTop + Math.max(0, (boxHeight - blockH) / 2);
 
-        if (treatment === "band") {
+        if (effective === "band") {
           ctx.fillStyle = theme.bg;
           ctx.fillRect(0, top, W, height);
-        } else if (treatment === "tag") {
+        } else if (effective === "tag") {
           const widest = Math.max(
             ...sub.lines.map((l) => {
               ctx.font = `${sub.fontSize}px InterPin`;
@@ -302,7 +361,7 @@ async function renderPin(image, pin, treatment = "band") {
     }
   }
 
-  return { buffer: await canvas.encode("jpeg", 92), W, H };
+  return { buffer: await canvas.encode("jpeg", 92), W, H, profiles };
 }
 
 /**
@@ -398,6 +457,12 @@ async function main() {
     console.log(`\n${copy.headline}`);
     console.log(`  board    ${copy.board}`);
     console.log(`  zone     ${pin.zone}  banner ${pin.banner ?? BOARD_BANNER[copy.board]}`);
+    for (const p of out.profiles) {
+      const note = p.fellBack
+        ? `no ink survives this band (conflict ${p.conflict.toFixed(2)}) -> solid block`
+        : `ink from the photograph (conflict ${p.conflict.toFixed(2)})`;
+      console.log(`  ${p.role.padEnd(8)} mean ${p.mean.toFixed(2)}  ${note}`);
+    }
     console.log(`  size     ${out.W}x${out.H}  (aspect preserved, not cropped)`);
     console.log(`  out      art/pins/out/${copy.board}/${outName}`);
   }

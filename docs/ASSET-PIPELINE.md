@@ -152,21 +152,46 @@ subject and its calm band is the mist across the centre.
 | `bare` | no block; type on the photograph | dark, tonally consistent images. Transformative there |
 | `rule` | `bare` plus a short brand rule above the headline | mid-tone images; keeps brand structure without covering anything |
 
-`bare` and `rule` pick type colour by **measuring the luminance behind the text**
-(`zoneLuminance`) rather than laying a scrim over the photograph to force one. A
-scrim would reintroduce the same problem in softer form, and the design system bans
+`bare` and `rule` pick type colour by **measuring what is behind the text**
+(`zoneProfile`) rather than laying a scrim over the photograph to force one. A scrim
+would reintroduce the same problem in softer form, and the design system bans
 gradients.
+
+**Measure the extremes, not the mean.** The first version averaged the band's
+luminance, and a band that is pale sky on one side and dark foliage on the other
+averages to a comfortable mid grey — so it chose light ink and the headline set
+white on white. `zoneProfile` instead reports the share of pixels too bright to
+hold chalk type and the share too dark to hold charcoal type. The smaller share
+picks the ink; the larger one is the risk.
+
+**Blockless type is refused when neither ink survives.** `adaptiveTheme` returns
+null above a conflict of `MAX_CONFLICT`, and that band falls back to a solid block
+on its own — per band, because a `split` pin's top and bottom are different
+pictures. Measured across every band of every pin:
+
+| Conflict | Bands |
+|---|---|
+| 0.00–0.03 | every band that reads cleanly on inspection |
+| 0.22 | pale sky, gold canopy and a dark trunk in one band |
+| 0.42 | overcast sky beside a dark bus shelter — headline was white on white |
+
+Nothing real lands between 0.03 and 0.22, so the cut sits mid-gap at **0.1**, far
+from either cluster. Every render prints its conflict figure, so an image landing
+in the gap says so rather than quietly looking wrong.
 
 Preview all four side by side with `npm run pins -- --variants`, which renders a
 dark, a bright and a mid-tone sample into `art/pins/variants/<treatment>/`.
 
-**Known limit:** `bare` needs a tonally consistent quiet zone. On the bright pool
-shots the adaptive ink correctly picks dark type, but the text crosses from pale
-deck onto turquoise water and legibility goes marginal. Use `band` there.
+**Known limit:** blockless type needs a tonally *consistent* quiet zone, not just
+a bright or a dark one. This is now detected rather than remembered — see the
+conflict table above — but the underlying constraint has not gone away. An image
+whose quiet zone spans both extremes will be given a block, and if you want it
+blockless the fix is a different zone or different art, not a lower threshold.
 
-### Recommended per-board treatment
+### Per-board treatment
 
-Not yet applied — `treatment` still defaults to `band`.
+`treatment` still defaults to `band`, so the first thirteen pins are unchanged.
+`pin-14` onward set `treatment: "rule"` explicitly.
 
 | Board | Recommended | Reason |
 |---|---|---|

@@ -362,20 +362,20 @@ export const pins: Pin[] = [
 
   // Golden-hour street, pram, jack-o'-lantern. Warm nostalgic light, so it gets
   // the line about the light going early rather than a party-utility line.
-  { file: "pin-14", copyId: "last-week-of-october", slug: "actually-scary", zone: "top" },
+  { file: "pin-14", copyId: "last-week-of-october", slug: "actually-scary", zone: "top", treatment: "rule" },
   // Dog in a bat costume mid-air. The costume line is the obvious pairing.
-  { file: "pin-15", copyId: "costume-is-great", slug: "actually-scary", zone: "top" },
+  { file: "pin-15", copyId: "costume-is-great", slug: "actually-scary", zone: "top", treatment: "rule" },
   // Ghost leaf-blowing the driveway at night: someone doing decoration labour,
   // under a line saying the decorations are not what gets remembered.
-  { file: "pin-16", copyId: "what-guests-remember", slug: "actually-scary", zone: "top" },
+  { file: "pin-16", copyId: "what-guests-remember", slug: "actually-scary", zone: "top", treatment: "rule" },
   // Poolside skeleton in full sun — reads as pre-season, which is exactly when
   // "save this before October" needs to land.
-  { file: "pin-17", copyId: "save-before-october", slug: "actually-scary", zone: "top" },
+  { file: "pin-17", copyId: "save-before-october", slug: "actually-scary", zone: "top", treatment: "rule" },
   // Lone pumpkin on a bus-stop bench under flat grey light. Deadpan image, so it
   // gets the deadpan line.
-  { file: "pin-18", copyId: "zero-thriller", slug: "actually-scary", zone: "top" },
+  { file: "pin-18", copyId: "zero-thriller", slug: "actually-scary", zone: "top", treatment: "rule" },
   // Retro supermarket lot at dusk — the exact nostalgia Monster Mash belongs to,
   // under a line that refuses it. Split because the FRESH PRODUCE sign sits at
   // 27% and the empty asphalt below the subject is the cleanest area in frame.
-  { file: "pin-19", copyId: "no-monster-mash", slug: "actually-scary", zone: "split" },
+  { file: "pin-19", copyId: "no-monster-mash", slug: "actually-scary", zone: "split", treatment: "rule" },
 ];
