@@ -230,6 +230,7 @@ async function main() {
   const freeCopy = Object.keys(PIN_COPY).filter((id) => !usedCopy.has(id));
   let made = 0;
   const missing = [];
+  const written = new Set();
 
   for (const file of art) {
     const name = path.basename(file, path.extname(file));
@@ -248,15 +249,24 @@ async function main() {
 
     const image = await loadImage(path.join(INBOX, file));
     const out = await renderPin(image, { ...pin, copy });
-    const outName = `${pin.slug}-${name}.jpg`;
-    await writeFile(path.join(OUT, outName), out.buffer);
+
+    // Grouped by board and named after the copy, so a board's folder can be
+    // bulk-uploaded or scheduled as one batch and every file says what it is.
+    const boardDir = path.join(OUT, copy.board);
+    await mkdir(boardDir, { recursive: true });
+
+    let outName = `${pin.slug}--${pin.copyId}.jpg`;
+    if (written.has(outName)) outName = `${pin.slug}--${pin.copyId}--${name}.jpg`;
+    written.add(outName);
+
+    await writeFile(path.join(boardDir, outName), out.buffer);
     made += 1;
 
     console.log(`\n${copy.headline}`);
     console.log(`  board    ${copy.board}`);
     console.log(`  zone     ${pin.zone}  banner ${pin.banner ?? BOARD_BANNER[copy.board]}`);
     console.log(`  size     ${out.W}x${out.H}  (aspect preserved, not cropped)`);
-    console.log(`  out      art/pins/out/${outName}`);
+    console.log(`  out      art/pins/out/${copy.board}/${outName}`);
   }
 
   if (missing.length) {

@@ -47,4 +47,4 @@ next-env.d.ts
 /art/spotify/*.jpg
 
 # Generated pins — rebuild with `npm run pins` from art/pins/inbox/
-/art/pins/out/*.jpg
+/art/pins/out/
