@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #08080b;
+  --color-ink-soft: #101016;
+  --color-card: #16161d;
+  --color-edge: #26262f;
+  --color-text: #f4f4f5;
+  --color-muted: #9a9aa5;
+  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-display), Georgia, serif;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--color-ink);
+  color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Provider iframes bring their own theming; just round the corners. */
+iframe {
+  border: 0;
+  border-radius: 14px;
+}
