@@ -2,38 +2,27 @@ import type { Act } from "@/lib/playlists";
 import { OWN_ARTIST } from "@/lib/site";
 
 /**
- * Alternating act-header blocks. Each entry carries its background AND the type
- * colours that read on it — the pairing is the point, so they travel together
- * rather than being applied independently and hoping they contrast.
+ * The act-header block. One scheme for every act: charcoal ground, chartreuse
+ * title, bubblegum label, cream note.
  *
- * Chartreuse block: dark type. Charcoal block: chartreuse type. The inversion
- * between consecutive acts is what makes the alternation feel deliberate instead
- * of like two unrelated colour choices.
+ * Deliberately not alternating. A single treatment makes the blocks read as
+ * structural rhythm — the same beat repeating down the page — rather than as a
+ * colour decision competing for attention with the type sitting on it.
  */
-const ACT_BLOCKS = [
-  {
-    bg: "bg-chartreuse",
-    label: "text-forest-ink",
-    title: "text-charcoal",
-    note: "text-charcoal",
-  },
-  {
-    bg: "bg-charcoal",
-    label: "text-bubblegum",
-    title: "text-chartreuse",
-    note: "text-warm-chalk",
-  },
-];
+const ACT_BLOCK = {
+  bg: "bg-charcoal",
+  label: "text-bubblegum",
+  title: "text-chartreuse",
+  note: "text-warm-chalk",
+};
 
 /**
  * The acts, in order, with continuous track numbering across act boundaries —
  * so track 14 is the 14th song you hear, not the 2nd song of act III.
  *
- * Spacing is deliberately tight here. The rest of the site breathes at 120px
- * section gaps, but this is a 26-row list someone is scanning: the act headers
- * carry the hierarchy, so the whitespace between rows doesn't have to. The
- * oversized act numeral sits beside the title rather than above it, which buys
- * emphasis without buying vertical space.
+ * Row spacing is deliberately tight. The rest of the site breathes at 120px
+ * section gaps, but this is a 26-row list someone is scanning: the act blocks
+ * carry the hierarchy, so the whitespace between rows does not have to.
  */
 export function Tracklist({
   acts,
@@ -52,10 +41,6 @@ export function Tracklist({
     <div className="flex flex-col gap-16">
       {acts.map((act, actIndex) => {
         const start = offsets[actIndex];
-        // Alternate the block, and invert the type with it: the chartreuse block
-        // carries dark type, the charcoal block carries chartreuse type. Reusing
-        // one type colour on both would fail contrast on one of them.
-        const block = ACT_BLOCKS[actIndex % ACT_BLOCKS.length];
 
         return (
           <section key={`${act.number}-${act.title}`} className="flex flex-col gap-4">
@@ -69,7 +54,7 @@ export function Tracklist({
               */}
               <div
                 aria-hidden
-                className={`absolute inset-y-0 left-1/2 -z-10 -ml-[50vw] w-[100vw] ${block.bg}`}
+                className={`absolute inset-y-0 left-1/2 -z-10 -ml-[50vw] w-[100vw] ${ACT_BLOCK.bg}`}
               />
 
               {/*
@@ -79,12 +64,12 @@ export function Tracklist({
                 value stay together and stay large. Works identically for
                 "MINUTES 30-47" on the time-structured playlist.
               */}
-              <p className={`display-sm mb-2 ${block.label}`}>
+              <p className={`display-sm mb-2 ${ACT_BLOCK.label}`}>
                 {actNoun} {act.number}
               </p>
-              <h3 className={`display-md ${block.title}`}>{act.title}</h3>
+              <h3 className={`display-md ${ACT_BLOCK.title}`}>{act.title}</h3>
               {act.note ? (
-                <p className={`mt-4 max-w-[60ch] text-[20px] leading-[1.2] ${block.note}`}>
+                <p className={`mt-4 max-w-[60ch] text-[20px] leading-[1.2] ${ACT_BLOCK.note}`}>
                   {act.note}
                 </p>
               ) : null}

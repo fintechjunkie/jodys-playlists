@@ -26,9 +26,9 @@
 
   /*
    * Chartreuse and charcoal are additions to the reference palette, requested
-   * for the alternating act blocks. They are the only two colors on the site
-   * outside the original system, and they appear ONLY as act-header block
-   * backgrounds — never as type on the cream canvas, which would break the
+   * for the act-header blocks: charcoal ground, chartreuse title. They are the
+   * only two colors on the site outside the original system and they appear ONLY
+   * inside those blocks — never on the cream canvas, which would break the
    * editorial voice the reference sets up.
    */
   --color-chartreuse: #d9f24b;
