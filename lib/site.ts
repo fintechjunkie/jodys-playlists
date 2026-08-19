@@ -28,21 +28,24 @@ export const OWN_ARTIST = "Jody Lynn";
  * The playlist creator, surfaced by the "About the playlist creator" dialog on
  * the home page and every playlist page.
  *
- * TODO: `blurb` is still placeholder copy — replace it with Jody's real bio
- * before launch. The Spotify artist URL is real.
+ * The first paragraph is Jody's own bio, in her voice, kept verbatim. Its
+ * closing "Follow @jodylynnmusic on IG" line is dropped because the Instagram
+ * link renders as a real button below — no reason to say it twice.
+ *
+ * Paragraphs are a real array rather than one string with escaped newlines:
+ * easier to edit, and impossible to get the escaping wrong.
  */
 export const CREATOR = {
   name: "Jody Lynn",
-  role: "Playlist creator, and the artist behind several tracks on every list",
-  blurb:
-    "Jody Lynn builds playlists the way records used to be sequenced — in acts, with a shape, meant to be played start to finish rather than shuffled. She writes and records her own music too, and a few of her tracks sit inside every list here alongside the artists who shaped them.",
+  role: "Songwriter, and the artist behind several tracks on every list",
+  paragraphs: [
+    "Songwriter in a lyrical life with a voice like sugar-coated barbwire. Pouring it all out, surrendering to my cathexis while serving up a little ear candy for ya! ;)",
+    "These playlists are that same habit pointed outward — made for the love of the music, and sequenced in acts so they play like a night instead of a shuffle. A few of my own songs sit in every one.",
+  ],
   // The ?si= share-tracking parameter is stripped deliberately: it identifies
   // the person who copied the link, and there's no reason to attach that to
   // every visitor who clicks through.
   spotifyArtistUrl: "https://open.spotify.com/artist/6YLtlPHlSvadNAENGawZDk",
+  instagramUrl: "https://www.instagram.com/jodylynnmusic/",
+  instagramHandle: "@jodylynnmusic",
 } as const;
-
-/** True once a real Spotify artist URL has been set. */
-export function hasCreatorSpotify(): boolean {
-  return !CREATOR.spotifyArtistUrl.includes("REPLACE_ME");
-}

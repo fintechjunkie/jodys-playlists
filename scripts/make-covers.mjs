@@ -40,8 +40,16 @@ const WARM_CHALK = "#fff8f6";
 const LIPSTICK_MAGENTA = "#db3c8a";
 const FOREST_INK = "#00522d";
 
+// Target sizes. Actual output is capped at the source resolution — upscaling
+// adds no detail and visibly softens the halftone texture these covers depend
+// on, so a 1254px original ships at 1254px rather than pretending to be 3000.
 const SPOTIFY_SIZE = 3000;
 const SITE_SIZE = 1600;
+
+/** Output size for a target, never exceeding what the source actually has. */
+function outputSize(target, image) {
+  return Math.min(target, Math.min(image.width, image.height));
+}
 
 const ACCEPTED = new Set([".png", ".jpg", ".jpeg", ".webp"]);
 
@@ -187,7 +195,7 @@ function dominantColor(image) {
 }
 
 async function renderTitled(image, playlist) {
-  const size = SPOTIFY_SIZE;
+  const size = outputSize(SPOTIFY_SIZE, image);
   const canvas = createCanvas(size, size);
   const ctx = canvas.getContext("2d");
 
@@ -238,16 +246,17 @@ async function renderTitled(image, playlist) {
     cursor += lineHeight;
   }
 
-  return { buffer: await canvas.encode("jpeg", 92), fontSize, lines };
+  return { buffer: await canvas.encode("jpeg", 92), fontSize, lines, size };
 }
 
 async function renderPlain(image) {
-  const canvas = createCanvas(SITE_SIZE, SITE_SIZE);
+  const size = outputSize(SITE_SIZE, image);
+  const canvas = createCanvas(size, size);
   const ctx = canvas.getContext("2d");
   ctx.fillStyle = WARM_CHALK;
-  ctx.fillRect(0, 0, SITE_SIZE, SITE_SIZE);
-  drawSquareCropped(ctx, image, SITE_SIZE);
-  return canvas.encode("jpeg", 90);
+  ctx.fillRect(0, 0, size, size);
+  drawSquareCropped(ctx, image, size);
+  return { buffer: await canvas.encode("jpeg", 90), size };
 }
 
 async function main() {
@@ -284,26 +293,27 @@ async function main() {
     }
 
     const image = await loadImage(path.join(INBOX, file));
-    if (image.width < 1200 || image.height < 1200) {
-      console.warn(
-        `WARN ${file} is only ${image.width}x${image.height}; 3000x3000 is the target and this will upscale softly.`,
+    if (Math.min(image.width, image.height) < SPOTIFY_SIZE) {
+      console.log(
+        `  note     source is ${image.width}x${image.height}; output capped there rather than upscaled to ${SPOTIFY_SIZE}`,
       );
     }
 
     const titled = await renderTitled(image, playlist);
     await writeFile(path.join(SPOTIFY_OUT, `${slug}-cover.jpg`), titled.buffer);
-    await writeFile(path.join(SITE_OUT, `${slug}.jpg`), await renderPlain(image));
+    const plain = await renderPlain(image);
+    await writeFile(path.join(SITE_OUT, `${slug}.jpg`), plain.buffer);
 
     const suggested = dominantColor(image);
     made += 1;
 
     console.log(`\n${playlist.title}`);
-    console.log(`  site     public/covers/${slug}.jpg          ${SITE_SIZE}px, no text`);
-    console.log(`  spotify  art/spotify/${slug}-cover.jpg   ${SPOTIFY_SIZE}px, title at ${titled.fontSize}px`);
+    console.log(`  site     public/covers/${slug}.jpg          ${plain.size}px, no text`);
+    console.log(`  spotify  art/spotify/${slug}-cover.jpg   ${titled.size}px, title at ${titled.fontSize}px`);
     console.log(`  title    ${titled.lines.join(" / ")}`);
     console.log(`  band     ${playlist.coverBand ?? "forest"}`);
     if (suggested) {
-      console.log(`  suggest  accent: ["${suggested}", "${WARM_CHALK}"]  <- paste into lib/playlists.ts`);
+      console.log(`  suggest  accent: "${suggested}"  <- paste into lib/playlists.ts`);
     }
     if (playlist.cover !== `/covers/${slug}.jpg`) {
       console.log(`  ACTION   set cover: "/covers/${slug}.jpg" in lib/playlists.ts (currently "${playlist.cover}")`);

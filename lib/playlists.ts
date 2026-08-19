@@ -69,10 +69,11 @@ export type Playlist = {
    */
   cover: string;
   /**
-   * Two flat hex colors: the first is painted behind the cover art while the
-   * image loads, so it should match the artwork's dominant color.
+   * Flat color painted behind the cover art while the image loads. Set it to
+   * the artwork's dominant motif color — `npm run covers` samples the art and
+   * prints the value to paste here.
    */
-  accent: [string, string];
+  accent: string;
   /**
    * Band color for the titled Spotify cover that `npm run covers` generates.
    * Pick the one that CONTRASTS with the artwork's motif — a magenta band
@@ -101,8 +102,8 @@ export const playlists: Playlist[] = [
     tagline: "No Monster Mash. No Thriller. Twenty six songs that feel like the night.",
     description:
       "No Monster Mash. No Thriller. Twenty six songs that actually feel like the night.\n\nSequenced from dusk to after midnight, so just press play and let it run the room.",
-    cover: "/covers/placeholder.svg",
-    accent: ["#140a1e", "#b91c1c"],
+    cover: "/covers/actually-scary.jpg",
+    accent: "#034325",
     coverBand: "magenta",
     tags: ["halloween", "goth", "industrial", "party"],
     published: "2026-08-19",
@@ -176,8 +177,8 @@ export const playlists: Playlist[] = [
     tagline: "For the night you're getting ready and you already know.",
     description:
       "For the night you're getting ready and you already know. Twenty six songs sequenced from first coat of mascara to walking out the door.\n\nConfidence, not closure.",
-    cover: "/covers/placeholder.svg",
-    accent: ["#1a0316", "#e11d48"],
+    cover: "/covers/revenge-dressing.jpg",
+    accent: "#ec2976",
     coverBand: "forest",
     tags: ["pop", "hype", "getting ready", "confidence"],
     published: "2026-08-19",

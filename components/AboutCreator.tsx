@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { CREATOR, hasCreatorSpotify } from "@/lib/site";
+import { CREATOR } from "@/lib/site";
 import { AnimatedTitle } from "./AnimatedTitle";
 
 /**
@@ -97,21 +97,32 @@ export function AboutCreator({ className = "" }: { className?: string }) {
                 {CREATOR.role}
               </p>
 
-              <p className="max-w-[60ch] text-[20px] leading-[1.2] text-forest-ink">
-                {CREATOR.blurb}
-              </p>
+              <div className="flex max-w-[60ch] flex-col gap-4">
+                {CREATOR.paragraphs.map((paragraph) => (
+                  <p key={paragraph.slice(0, 24)} className="text-[20px] leading-[1.2] text-forest-ink">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
 
               <div className="mt-10 flex flex-wrap items-center gap-5">
-                {hasCreatorSpotify() ? (
-                  <a
-                    href={CREATOR.spotifyArtistUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="border-2 border-forest-ink bg-forest-ink px-5 py-2.5 text-[14px] font-semibold text-warm-chalk transition-colors hover:bg-lipstick-magenta hover:border-lipstick-magenta"
-                  >
-                    {CREATOR.name} on Spotify ↗
-                  </a>
-                ) : null}
+                <a
+                  href={CREATOR.spotifyArtistUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="border-2 border-forest-ink bg-forest-ink px-5 py-2.5 text-[14px] font-semibold text-warm-chalk transition-colors hover:border-lipstick-magenta hover:bg-lipstick-magenta"
+                >
+                  Listen on Spotify ↗
+                </a>
+
+                <a
+                  href={CREATOR.instagramUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="border-2 border-forest-ink px-5 py-2.5 text-[14px] font-semibold text-forest-ink transition-colors hover:border-lipstick-magenta hover:text-lipstick-magenta"
+                >
+                  {CREATOR.instagramHandle} ↗
+                </a>
 
                 <button
                   ref={closeRef}

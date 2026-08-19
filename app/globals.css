@@ -8,6 +8,15 @@
 @theme {
   --color-lipstick-magenta: #db3c8a;
   --color-forest-ink: #00522d;
+  /*
+   * Two lighter greens, added to the reference's palette for one specific
+   * reason: display lines overlap at line-height 0.70, so the hover state needs
+   * a cycle just like the pinks do. A single flat green makes a multi-line title
+   * merge into an unreadable mass. Same hue as forest ink, stepped in lightness,
+   * and both still clear 3:1 against the cream ground for large text.
+   */
+  --color-forest-mid: #2c8055;
+  --color-forest-light: #4f9e73;
   --color-blush-cream: #fce5df;
   --color-warm-chalk: #fff8f6;
   --color-charcoal-black: #000000;
@@ -148,13 +157,13 @@ iframe {
   transition-delay: calc(var(--i) * 18ms);
 }
 
-/* Index rows: sweep the title into forest ink letter by letter on hover.
-   Titles now sit in cycling pinks, so green is the contrast that reads —
-   sweeping to magenta would flatten the per-line color distinction. */
-.title-sweep:hover .char,
-.title-sweep:focus-visible .char {
-  color: var(--color-forest-ink);
-}
+/*
+ * Index rows sweep from the pink cycle into the green cycle on hover, letter by
+ * letter. The colors live on each LINE (see AnimatedTitle) and the characters
+ * inherit them, so a single inherited-color change still animates per character
+ * via the transition-delay above. A uniform `.char { color: green }` rule here
+ * would flatten every line to the same green and make overlapping lines merge.
+ */
 
 /* The faded echo band that drifts behind a hero title. */
 .marquee {

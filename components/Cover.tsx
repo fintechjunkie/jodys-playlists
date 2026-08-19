@@ -21,7 +21,7 @@ export function Cover({
   return (
     <div
       className={`relative aspect-square w-full overflow-hidden ${className}`}
-      style={{ background: playlist.accent[0] }}
+      style={{ background: playlist.accent }}
     >
       <Image
         src={playlist.cover}

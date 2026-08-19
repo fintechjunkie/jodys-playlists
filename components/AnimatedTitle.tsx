@@ -11,6 +11,21 @@ import type { ElementType } from "react";
 const LINE_COLORS = ["text-lipstick-magenta", "text-bubblegum", "text-cotton-pink"];
 
 /**
+ * Hover cycle for index rows, mirroring the pink cycle in the green family:
+ * deep, lightest, mid. It has to be a cycle for exactly the same reason the
+ * resting colors do — sweeping every line to one flat green makes overlapping
+ * lines merge into an unreadable mass.
+ *
+ * These go on the LINE, not the character, so the characters inherit the change
+ * and still recolor one at a time via their staggered transition-delay.
+ */
+export const HOVER_COLORS = [
+  "group-hover:text-forest-ink group-focus-visible:text-forest-ink",
+  "group-hover:text-forest-light group-focus-visible:text-forest-light",
+  "group-hover:text-forest-mid group-focus-visible:text-forest-mid",
+];
+
+/**
  * A display title whose characters rise into place one after another.
  *
  * Pure CSS — the stagger is an inline `--i` per character feeding an
@@ -31,6 +46,12 @@ export function AnimatedTitle({
   as: Tag = "h1" as ElementType,
   className = "",
   colors = LINE_COLORS,
+  /**
+   * Per-line hover colors, applied only when the title sits inside an element
+   * with Tailwind's `group` class. Pass [] to opt out (page headings, where
+   * there is nothing to hover).
+   */
+  hoverColors = [],
   /** Milliseconds of extra delay before the first character moves. */
   delay = 0,
 }: {
@@ -38,6 +59,7 @@ export function AnimatedTitle({
   as?: ElementType;
   className?: string;
   colors?: string[];
+  hoverColors?: string[];
   delay?: number;
 }) {
   // Character index each line starts at, so the stagger runs continuously
@@ -63,7 +85,9 @@ export function AnimatedTitle({
             key={`${line}-${lineIndex}`}
             // Each line is its own block so the color applies per line and the
             // overlapping leading stays intentional.
-            className={`block ${colors[lineIndex % colors.length]}`}
+            className={`block ${colors[lineIndex % colors.length]} ${
+              hoverColors.length ? hoverColors[lineIndex % hoverColors.length] : ""
+            }`}
           >
             {words.map((word, wordIndex) => (
               <span key={`${word}-${wordIndex}`}>

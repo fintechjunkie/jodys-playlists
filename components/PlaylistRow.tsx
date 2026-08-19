@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { titleLines, trackCount, type Playlist } from "@/lib/playlists";
 import { PROVIDER_LABEL } from "@/lib/providers";
-import { AnimatedTitle } from "./AnimatedTitle";
+import { AnimatedTitle, HOVER_COLORS } from "./AnimatedTitle";
 import { Cover } from "./Cover";
 
 /**
@@ -26,7 +26,7 @@ export function PlaylistRow({
   return (
     <Link
       href={`/${playlist.slug}`}
-      className="title-sweep group block border-t border-blush-cream py-10 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-lipstick-magenta"
+      className="group block border-t border-blush-cream py-10 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-lipstick-magenta"
     >
       <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:gap-10">
         {/* Asymmetric: image left, type right, never centered. */}
@@ -47,6 +47,7 @@ export function PlaylistRow({
             lines={titleLines(playlist)}
             as="h2"
             className="display-md"
+            hoverColors={HOVER_COLORS}
             delay={index * 90}
           />
 
