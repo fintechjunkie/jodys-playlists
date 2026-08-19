@@ -184,6 +184,116 @@ export const PIN_COPY: Record<string, PinCopy> = {
     // Undertow 15, DARK 22. Re-check these numbers if the tracklist changes.
     subline: "Her songs are 4, 8, 15 and 22",
   },
+
+  // ---- Round 2: previously unused concepts, held for the next batch of images.
+  //      Same selection rule as above — short headlines set larger, and no two
+  //      lines on one board attacking the same angle. ----
+
+  // Board 1: Halloween Party Ideas
+  "no-monster-mash": {
+    board: "party-ideas",
+    headline: "No Monster Mash",
+    subline: "26 songs that actually feel like the night",
+  },
+  "26-songs-two-hours": {
+    board: "party-ideas",
+    headline: "26 songs. Two hours. No skips.",
+    // Supplied as "Four hours" — corrected. 26 tracks runs about 1h45m, and an
+    // overstated runtime is the kind of claim that reads as spam on a paid pin.
+    subline: "Sequenced dusk to after midnight",
+  },
+  "adults-only": {
+    board: "party-ideas",
+    headline: "Adults only Halloween party",
+    subline: "No novelty songs. Not one.",
+  },
+  "costume-is-great": {
+    board: "party-ideas",
+    headline: "Your costume is great",
+    subline: "Your playlist is not. Free fix inside.",
+  },
+  "small-party-big-atmosphere": {
+    board: "party-ideas",
+    headline: "Small party, big atmosphere",
+    subline: "You don't need decorations if the sound is right",
+  },
+  "what-guests-remember": {
+    board: "party-ideas",
+    headline: "The one thing guests actually remember",
+    subline: "And it isn't the decorations",
+  },
+
+  // Board 2: Moody Halloween Aesthetic
+  "room-already-looks-like-this": {
+    board: "moody-aesthetic",
+    headline: "The room already looks like this",
+    subline: "Make it sound like it too",
+  },
+  "gothic-not-gimmicky": {
+    board: "moody-aesthetic",
+    headline: "Gothic, not gimmicky",
+    subline: "Dark pop and goth for October nights",
+  },
+  "dark-academia": {
+    board: "moody-aesthetic",
+    headline: "Dark academia Halloween",
+    subline: "Sound design for a room like this",
+  },
+  "candlelight-underneath": {
+    board: "moody-aesthetic",
+    headline: "Candlelight and something underneath it",
+    subline: "A playlist for the mood you already built",
+  },
+  "oxblood-and-brass": {
+    board: "moody-aesthetic",
+    headline: "Oxblood, brass, and bare branches",
+    subline: "The playlist that goes with it",
+  },
+  "last-week-of-october": {
+    board: "moody-aesthetic",
+    headline: "For the last week of October",
+    subline: "When the light goes early and you don't mind",
+  },
+
+  // Board 3: Halloween Party Playlists
+  "save-before-october": {
+    board: "party-playlists",
+    headline: "Save this before October",
+    subline: "You will forget and then it will be too late",
+  },
+  "home-alone-lights-off": {
+    board: "party-playlists",
+    headline: "Halloween night, home alone, lights off",
+    subline: "This is the playlist",
+  },
+  "track-22-gets-quiet": {
+    board: "party-playlists",
+    headline: "Track 22 is where it gets quiet",
+    // Verified: track 22 sits in Act IV, "After Midnight / Comedown, eerier".
+    subline: "Sequenced to run the whole night",
+  },
+  "industrial-goth-dark-pop": {
+    board: "party-playlists",
+    headline: "Industrial, goth, dark pop",
+    subline: "The Halloween playlist for people with taste",
+  },
+  "nu-metal-playlist": {
+    board: "party-playlists",
+    headline: "Nu metal Halloween playlist",
+    // Deftones, Korn and Rob Zombie are all on it, but the playlist is much
+    // broader than nu metal. Fine as a targeted pin, wrong as the main pitch.
+    subline: "Deftones, Korn, Rob Zombie and more",
+  },
+  "comedown-matters": {
+    board: "party-playlists",
+    headline: "The comedown matters too",
+    subline: "Act four is for the people still on the floor",
+  },
+  "doesnt-embarrass-you": {
+    board: "party-playlists",
+    headline: "Halloween playlist that doesn't embarrass you",
+    subline: "26 songs. Free on Spotify.",
+  },
 };
 
 export type Pin = {
@@ -245,4 +355,27 @@ export const pins: Pin[] = [
     zone: "middle",
     banner: "charcoal",
   },
+
+  // --- Round 2. Suburban and comic in register rather than gothic, so copy is
+  //     matched to the joke in the frame. All four have a genuinely clean top
+  //     third, which the first batch mostly did not. ---
+
+  // Golden-hour street, pram, jack-o'-lantern. Warm nostalgic light, so it gets
+  // the line about the light going early rather than a party-utility line.
+  { file: "pin-14", copyId: "last-week-of-october", slug: "actually-scary", zone: "top" },
+  // Dog in a bat costume mid-air. The costume line is the obvious pairing.
+  { file: "pin-15", copyId: "costume-is-great", slug: "actually-scary", zone: "top" },
+  // Ghost leaf-blowing the driveway at night: someone doing decoration labour,
+  // under a line saying the decorations are not what gets remembered.
+  { file: "pin-16", copyId: "what-guests-remember", slug: "actually-scary", zone: "top" },
+  // Poolside skeleton in full sun — reads as pre-season, which is exactly when
+  // "save this before October" needs to land.
+  { file: "pin-17", copyId: "save-before-october", slug: "actually-scary", zone: "top" },
+  // Lone pumpkin on a bus-stop bench under flat grey light. Deadpan image, so it
+  // gets the deadpan line.
+  { file: "pin-18", copyId: "zero-thriller", slug: "actually-scary", zone: "top" },
+  // Retro supermarket lot at dusk — the exact nostalgia Monster Mash belongs to,
+  // under a line that refuses it. Split because the FRESH PRODUCE sign sits at
+  // 27% and the empty asphalt below the subject is the cleanest area in frame.
+  { file: "pin-19", copyId: "no-monster-mash", slug: "actually-scary", zone: "split" },
 ];
