@@ -6,7 +6,19 @@
 export const SITE_DOMAIN = process.env.NEXT_PUBLIC_SITE_DOMAIN ?? "jodysplaylists.com";
 export const SITE_URL = `https://${SITE_DOMAIN}`;
 export const SITE_NAME = "Jody's Playlists";
-export const SITE_TAGLINE = "Playlists worth the drive.";
+/**
+ * Hero line and the suffix on the home page's title tag. Kept as two short
+ * clauses because the hero sets it as two overlapping display lines — see
+ * HERO_LINES below, which must stay in sync with it.
+ */
+export const SITE_TAGLINE = "Steal these. Play them loud.";
+
+/**
+ * The tagline broken for the hero. Lines are authored rather than wrapped: at
+ * line-height 0.70 they overlap and take different colors, so where the break
+ * falls is a design decision.
+ */
+export const HERO_LINES = ["Steal these", "Play them loud"];
 
 /** Canonical URL for a playlist. Always the path form, never the subdomain. */
 export function playlistUrl(slug: string): string {

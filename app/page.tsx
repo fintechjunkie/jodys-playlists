@@ -1,4 +1,5 @@
 import { livePlaylists } from "@/lib/playlists";
+import { HERO_LINES } from "@/lib/site";
 import { AboutCreator } from "@/components/AboutCreator";
 import { AnimatedTitle } from "@/components/AnimatedTitle";
 import { PlaylistRow } from "@/components/PlaylistRow";
@@ -15,7 +16,7 @@ export default function Home() {
       <section className="flex min-h-[72vh] flex-col justify-end pb-20 pt-32">
         <p className="label-micro mb-8 text-forest-ink">Sequenced, not shuffled</p>
 
-        <AnimatedTitle lines={["Playlists", "worth the drive"]} className="display-xl" />
+        <AnimatedTitle lines={HERO_LINES} className="display-xl" />
 
         <p className="mt-12 max-w-[60ch] text-[20px] leading-[1.2] text-forest-ink">
           {all.length} playlists, each built as a set of acts with the running order
@@ -26,7 +27,7 @@ export default function Home() {
       </section>
 
       {/* Faded echo of the statement above, drifting. Decorative only. */}
-      <TitleMarquee text="worth the drive —" className="text-blush-cream" />
+      <TitleMarquee text="play them loud —" className="text-blush-cream" />
 
       <section aria-label="All playlists" className="pt-20">
         <p className="label-micro mb-8 text-lipstick-magenta">The index</p>
