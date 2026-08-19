@@ -1,38 +1,37 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { Inter, Fraunces } from "next/font/google";
+import { Anton, Inter } from "next/font/google";
+import { livePlaylists } from "@/lib/playlists";
 import { SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/site";
+import { CornerNav } from "@/components/CornerNav";
 import "./globals.css";
 
-const sans = Inter({ subsets: ["latin"], variable: "--font-sans" });
-const display = Fraunces({ subsets: ["latin"], variable: "--font-display" });
+// Stand-ins for Beni and Clash Grotesk, per the style reference's substitute list.
+const display = Anton({ subsets: ["latin"], weight: "400", variable: "--font-anton" });
+const sans = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: { default: `${SITE_NAME} — ${SITE_TAGLINE}`, template: `%s — ${SITE_NAME}` },
-  description: "Hand-built playlists across Spotify, Apple Music and YouTube.",
+  description: "Hand-sequenced playlists. Each one built as a set of acts, dusk to after midnight.",
   openGraph: { siteName: SITE_NAME, type: "website" },
   twitter: { card: "summary_large_image" },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const links = livePlaylists().map((p) => ({ slug: p.slug, title: p.title }));
+
   return (
-    <html lang="en" className={`${sans.variable} ${display.variable}`}>
-      <body className="min-h-dvh flex flex-col">
-        <header className="border-b border-edge/60">
-          <div className="mx-auto max-w-6xl px-6 py-5">
-            <Link href="/" className="font-display text-xl tracking-tight hover:opacity-80">
-              {SITE_NAME}
-            </Link>
-          </div>
-        </header>
+    <html lang="en" className={`${display.variable} ${sans.variable}`}>
+      <body className="min-h-dvh">
+        <CornerNav links={links} />
 
-        <main className="flex-1">{children}</main>
+        {/* No nav bar, no breadcrumbs — the corner circles are the whole chrome. */}
+        <main>{children}</main>
 
-        <footer className="border-t border-edge/60 mt-24">
-          <div className="mx-auto max-w-6xl px-6 py-8 text-sm text-muted">
+        <footer className="mx-auto max-w-[1440px] px-6 pb-15 pt-30 sm:px-15">
+          <p className="label-micro text-forest-ink">
             © {new Date().getFullYear()} {SITE_NAME}
-          </div>
+          </p>
         </footer>
       </body>
     </html>

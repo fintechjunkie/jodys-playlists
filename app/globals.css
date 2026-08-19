@@ -1,28 +1,177 @@
 @import "tailwindcss";
 
+/*
+ * Agence Foudre style reference. Warm cream canvas, forest-green body copy,
+ * lipstick magenta as punctuation. Deliberately flat: no shadows, no gradients,
+ * no glass. Depth comes from typographic scale and color contrast only.
+ */
 @theme {
-  --color-ink: #08080b;
-  --color-ink-soft: #101016;
-  --color-card: #16161d;
-  --color-edge: #26262f;
-  --color-text: #f4f4f5;
-  --color-muted: #9a9aa5;
-  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-display), Georgia, serif;
+  --color-lipstick-magenta: #db3c8a;
+  --color-forest-ink: #00522d;
+  --color-blush-cream: #fce5df;
+  --color-warm-chalk: #fff8f6;
+  --color-charcoal-black: #000000;
+  --color-lilac-mist: #d1cfe4;
+  --color-bubblegum: #f29ebd;
+  --color-cotton-pink: #e878b2;
+
+  /*
+   * Beni and Clash Grotesk aren't free/self-hostable, so these are the
+   * substitutes the reference names: Anton stands in for Beni (ultra-black
+   * condensed display, weight baked in), Inter for Clash Grotesk.
+   */
+  --font-display: var(--font-anton), "Antonio", "Arial Narrow", sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  --radius-lg: 10px;
+  --radius-2xl: 20px;
+  --radius-3xl: 25px;
+
+  /* The reference's 4px base already matches Tailwind's default spacing step,
+     so p-2/p-3/p-5/p-15/p-30 give 8/12/20/60/120px. No custom scale needed. */
 }
 
 html {
-  color-scheme: dark;
+  color-scheme: light;
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--color-ink);
-  color: var(--color-text);
+  background: var(--color-warm-chalk);
+  color: var(--color-forest-ink);
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
 }
 
-/* Provider iframes bring their own theming; just round the corners. */
+::selection {
+  background: var(--color-lipstick-magenta);
+  color: var(--color-warm-chalk);
+}
+
+/*
+ * Display type. The reference fixes sizes at 46/80/94/130/230px; these clamp()
+ * ranges land on those values at desktop widths and collapse proportionally
+ * below, which is the responsive behavior it asks for. Line-height 0.70 and the
+ * ultra-black weight are what make the blocks read as architectural.
+ */
+.display-xl {
+  font-family: var(--font-display);
+  font-size: clamp(3.5rem, 15vw, 230px);
+  line-height: 0.7;
+  text-transform: uppercase;
+}
+
+.display-lg {
+  font-family: var(--font-display);
+  font-size: clamp(2.75rem, 9.5vw, 130px);
+  line-height: 0.7;
+  text-transform: uppercase;
+}
+
+.display-md {
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 6.5vw, 94px);
+  line-height: 0.7;
+  text-transform: uppercase;
+}
+
+.display-sm {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 4vw, 46px);
+  line-height: 0.78;
+  text-transform: uppercase;
+}
+
+/* Editorial micro-label that sits directly above a display block. */
+.label-micro {
+  font-size: 12px;
+  line-height: 14px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* Provider iframes bring their own theming. Square them off — the reference
+   forbids rounded corners on media. */
 iframe {
   border: 0;
-  border-radius: 14px;
+  display: block;
+}
+
+/* ---------- Motion ----------
+ * Titles are the only animated element in the system. Everything else stays
+ * still, which is what makes the type feel deliberate rather than decorative.
+ */
+
+@keyframes char-rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.55em) scaleY(1.12);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scaleY(1);
+  }
+}
+
+@keyframes marquee-drift {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes marquee-drift-reverse {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* One character of an animated title. --i is its index, set inline. */
+.char {
+  display: inline-block;
+  white-space: pre;
+  animation: char-rise 0.85s cubic-bezier(0.16, 0.84, 0.24, 1) both;
+  animation-delay: calc(var(--i) * 28ms);
+  /* Hover recolor is a transition, not an animation, so it never fights the
+     entrance keyframes above (those only touch opacity and transform). */
+  transition: color 0.3s ease;
+  transition-delay: calc(var(--i) * 18ms);
+}
+
+/* Index rows: sweep the title into magenta letter by letter on hover. */
+.title-sweep:hover .char,
+.title-sweep:focus-visible .char {
+  color: var(--color-lipstick-magenta);
+}
+
+/* The faded echo band that drifts behind a hero title. */
+.marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee-drift 38s linear infinite;
+}
+
+.marquee-reverse {
+  animation-name: marquee-drift-reverse;
+  animation-duration: 52s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .char {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  .marquee {
+    animation: none;
+  }
 }

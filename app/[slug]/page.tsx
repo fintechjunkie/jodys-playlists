@@ -4,9 +4,11 @@ import { notFound } from "next/navigation";
 import { getPlaylist, livePlaylists, trackCount } from "@/lib/playlists";
 import { embeddableSource } from "@/lib/providers";
 import { playlistUrl, SITE_NAME } from "@/lib/site";
+import { AnimatedTitle } from "@/components/AnimatedTitle";
 import { Cover } from "@/components/Cover";
 import { PlayerEmbed } from "@/components/PlayerEmbed";
 import { SourceLinks } from "@/components/SourceLinks";
+import { TitleMarquee } from "@/components/TitleMarquee";
 import { Tracklist } from "@/components/Tracklist";
 
 type Params = { params: Promise<{ slug: string }> };
@@ -45,83 +47,80 @@ export default async function PlaylistPage({ params }: Params) {
   if (!playlist) notFound();
 
   const embed = embeddableSource(playlist);
-  const [from, to] = playlist.accent;
   const count = trackCount(playlist);
 
   return (
     <div>
-      {/* Ambient wash pulled from the playlist's own accent colors. */}
-      <div
-        aria-hidden
-        className="h-56 w-full opacity-40 blur-3xl"
-        style={{
-          background: `radial-gradient(70% 100% at 50% 0%, ${to}, ${from} 65%, transparent)`,
-        }}
-      />
-
-      <div className="mx-auto -mt-40 max-w-3xl px-6">
-        <header className="flex flex-col gap-8 sm:flex-row sm:items-end">
-          <div className="w-40 shrink-0 sm:w-52">
-            <Cover playlist={playlist} priority sizes="208px" />
-          </div>
-
-          <div className="flex flex-col gap-3">
-            <h1 className="font-display text-3xl leading-tight tracking-tight sm:text-4xl">
-              {playlist.title}
-            </h1>
-            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted">
-              <span>{count} tracks</span>
-              <span aria-hidden>·</span>
-              <span>
-                {playlist.acts.length} {playlist.acts.length === 1 ? "act" : "acts"}
-              </span>
-              {playlist.duration ? (
-                <>
-                  <span aria-hidden>·</span>
-                  <span>{playlist.duration}</span>
-                </>
-              ) : null}
-            </div>
-          </div>
-        </header>
-
-        {/* The pitch. Read this before deciding whether to press play. */}
-        <div className="mt-10 max-w-2xl">
-          <p className="whitespace-pre-line text-lg leading-relaxed text-zinc-200">
-            {playlist.description}
+      <div className="mx-auto max-w-[1440px] px-6 sm:px-15">
+        {/* Hero: the title arrives letter by letter, bottom-anchored, no image
+            competing with it. The type is the layout. */}
+        <header className="flex min-h-[78vh] flex-col justify-end pb-15 pt-40">
+          <p className="label-micro mb-8 text-forest-ink">
+            {count} tracks · {playlist.acts.length} acts
+            {playlist.duration ? ` · ${playlist.duration}` : ""}
           </p>
-        </div>
 
-        <div className="mt-10 flex flex-col gap-6">
-          <SourceLinks sources={playlist.sources} />
-          {embed ? <PlayerEmbed source={embed} /> : null}
-        </div>
+          <AnimatedTitle text={playlist.title} className="display-lg text-lipstick-magenta" />
+        </header>
+      </div>
 
-        <hr className="my-14 border-edge/50" />
+      {/* The title again as a drifting echo band — the dynamic counterpoint to
+          the statement above. */}
+      <TitleMarquee text={`${playlist.title} —`} className="text-blush-cream" />
 
-        <section aria-label="Tracklist">
-          <h2 className="mb-10 font-display text-2xl tracking-tight">The sequence</h2>
+      <div className="mx-auto max-w-[1440px] px-6 sm:px-15">
+        {/* The pitch. This is what someone reads before deciding to press play. */}
+        <section className="flex flex-col gap-12 pt-30 sm:flex-row sm:gap-15">
+          <div className="w-full max-w-[320px] shrink-0">
+            <Cover playlist={playlist} priority sizes="(max-width: 640px) 90vw, 320px" />
+          </div>
+
+          <div className="flex flex-col gap-8">
+            <p className="max-w-[60ch] whitespace-pre-line text-[20px] leading-[1.2] text-forest-ink">
+              {playlist.description}
+            </p>
+
+            <SourceLinks sources={playlist.sources} />
+
+            {playlist.tags?.length ? (
+              <ul className="flex flex-wrap gap-2">
+                {playlist.tags.map((tag) => (
+                  <li
+                    key={tag}
+                    className="rounded-full bg-blush-cream px-[15px] py-[7px] text-[12px] font-medium text-forest-ink"
+                  >
+                    {tag}
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </div>
+        </section>
+
+        {embed ? (
+          <section className="pt-30">
+            <p className="label-micro mb-8 text-lipstick-magenta">Listen</p>
+            <PlayerEmbed source={embed} />
+          </section>
+        ) : null}
+
+        <section aria-label="Tracklist" className="pt-30">
+          <p className="label-micro mb-8 text-forest-ink">
+            {playlist.acts.length} {playlist.acts.length === 1 ? "act" : "acts"}, in order
+          </p>
+          <AnimatedTitle
+            text="The sequence"
+            as="h2"
+            className="display-md mb-30 text-lipstick-magenta"
+          />
           <Tracklist acts={playlist.acts} />
         </section>
 
-        {playlist.tags?.length ? (
-          <ul className="mt-14 flex flex-wrap gap-2">
-            {playlist.tags.map((tag) => (
-              <li
-                key={tag}
-                className="rounded-full border border-edge px-3 py-1 text-xs text-muted"
-              >
-                {tag}
-              </li>
-            ))}
-          </ul>
-        ) : null}
-
         <Link
           href="/"
-          className="mt-14 inline-block text-sm text-muted underline underline-offset-4 hover:text-text"
+          className="label-micro mt-30 inline-block text-lipstick-magenta hover:text-forest-ink"
         >
-          All playlists
+          ← All playlists
         </Link>
       </div>
     </div>

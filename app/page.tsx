@@ -1,30 +1,43 @@
 import { livePlaylists } from "@/lib/playlists";
-import { SITE_TAGLINE } from "@/lib/site";
-import { PlaylistCard } from "@/components/PlaylistCard";
+import { AnimatedTitle } from "@/components/AnimatedTitle";
+import { PlaylistRow } from "@/components/PlaylistRow";
+import { TitleMarquee } from "@/components/TitleMarquee";
 
 export default function Home() {
   const all = livePlaylists();
 
   return (
-    <div className="mx-auto max-w-6xl px-6">
-      <section className="py-14 sm:py-20">
-        <h1 className="font-display text-4xl sm:text-5xl tracking-tight max-w-2xl leading-[1.1]">
-          {SITE_TAGLINE}
-        </h1>
-        <p className="mt-5 max-w-xl text-muted leading-relaxed">
-          {all.length} playlists, made by hand, one mood at a time. Play them here or
-          take them with you to Spotify, Apple Music or YouTube.
+    <div className="mx-auto max-w-[1440px] px-6 sm:px-15">
+      {/* One idea per screen: the hero is a typographic statement, nothing else. */}
+      <section className="flex min-h-[82vh] flex-col justify-end pb-30 pt-40">
+        <p className="label-micro mb-8 text-forest-ink">Sequenced, not shuffled</p>
+
+        <AnimatedTitle text="Playlists" className="display-xl text-lipstick-magenta" />
+        <AnimatedTitle
+          text="worth the drive"
+          className="display-xl text-bubblegum"
+          delay={280}
+        />
+
+        <p className="mt-15 max-w-[60ch] text-[20px] leading-[1.2] text-forest-ink">
+          {all.length} playlists, each built as a set of acts with the running order
+          explained. Play them here or take them to Spotify, Apple Music or YouTube.
         </p>
       </section>
 
-      <section aria-label="All playlists" className="pb-8">
+      {/* Faded echo of the statement above, drifting. Decorative only. */}
+      <TitleMarquee text="worth the drive —" className="text-blush-cream" />
+
+      <section aria-label="All playlists" className="pt-30">
+        <p className="label-micro mb-12 text-lipstick-magenta">The index</p>
+
         {all.length === 0 ? (
-          <p className="text-muted">No playlists yet — check back soon.</p>
+          <p className="text-[20px] text-forest-ink">No playlists yet.</p>
         ) : (
-          <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="flex flex-col">
             {all.map((playlist, i) => (
-              <li key={playlist.slug} className="flex">
-                <PlaylistCard playlist={playlist} priority={i < 3} />
+              <li key={playlist.slug}>
+                <PlaylistRow playlist={playlist} index={i} priority={i < 2} />
               </li>
             ))}
           </ul>
