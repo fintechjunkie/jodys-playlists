@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "covers": "node --no-warnings=MODULE_TYPELESS_PACKAGE_JSON scripts/make-covers.mjs"
   },
   "dependencies": {
     "next": "16.3.1",
@@ -14,6 +15,7 @@
     "react-dom": "19.2.8"
   },
   "devDependencies": {
+    "@napi-rs/canvas": "^1.0.7",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

@@ -68,8 +68,17 @@ export type Playlist = {
    * CDN (Spotify/Apple/YouTube hosts are allowlisted in next.config.ts).
    */
   cover: string;
-  /** Two hex colors — the card's fallback gradient and the page's glow. */
+  /**
+   * Two flat hex colors: the first is painted behind the cover art while the
+   * image loads, so it should match the artwork's dominant color.
+   */
   accent: [string, string];
+  /**
+   * Band color for the titled Spotify cover that `npm run covers` generates.
+   * Pick the one that CONTRASTS with the artwork's motif — a magenta band
+   * against a magenta motif merges into a single blob at thumbnail size.
+   */
+  coverBand?: "magenta" | "forest";
   acts: Act[];
   /** Optional, e.g. "1 hr 47 min". Track count is derived from `acts`. */
   duration?: string;
@@ -94,6 +103,7 @@ export const playlists: Playlist[] = [
       "No Monster Mash. No Thriller. Twenty six songs that actually feel like the night.\n\nSequenced from dusk to after midnight, so just press play and let it run the room.",
     cover: "/covers/placeholder.svg",
     accent: ["#140a1e", "#b91c1c"],
+    coverBand: "magenta",
     tags: ["halloween", "goth", "industrial", "party"],
     published: "2026-08-19",
     // TODO: add the real share links + Spotify playlist ID. While `sources` is
@@ -168,6 +178,7 @@ export const playlists: Playlist[] = [
       "For the night you're getting ready and you already know. Twenty six songs sequenced from first coat of mascara to walking out the door.\n\nConfidence, not closure.",
     cover: "/covers/placeholder.svg",
     accent: ["#1a0316", "#e11d48"],
+    coverBand: "forest",
     tags: ["pop", "hype", "getting ready", "confidence"],
     published: "2026-08-19",
     // TODO: add the real share links + Spotify playlist ID (see note above).

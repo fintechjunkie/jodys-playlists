@@ -17,9 +17,11 @@ const LINE_COLORS = ["text-lipstick-magenta", "text-bubblegum", "text-cotton-pin
  * animation-delay in globals.css, so this stays a server component and the
  * animation runs before any JS arrives. `prefers-reduced-motion` kills it.
  *
- * Lines are explicit rather than left to wrapping: with overlapping leading,
- * where a line breaks is a design decision, and auto-wrap would put arbitrary
- * words in arbitrary colors at every viewport width.
+ * Characters are individually positioned, which means they must be grouped into
+ * word-level inline-blocks: without that grouping the browser treats every
+ * character as its own break opportunity and happily splits "DRIVE" into
+ * "DRI / VE" at narrow widths. Words are atomic; only the spaces between them
+ * are breakable.
  *
  * The characters are aria-hidden and the real text goes on the wrapper's
  * aria-label, otherwise screen readers announce the title letter by letter.
@@ -47,28 +49,47 @@ export function AnimatedTitle({
 
   return (
     <Tag className={className} aria-label={lines.join(" ")}>
-      {lines.map((line, lineIndex) => (
-        <span
-          key={`${line}-${lineIndex}`}
-          // Each line is its own block so the color applies per line and the
-          // overlapping leading stays intentional.
-          className={`block ${colors[lineIndex % colors.length]}`}
-        >
-          {[...line].map((char, charIndex) => {
-            const i = lineOffsets[lineIndex] + charIndex;
-            return (
-              <span
-                key={i}
-                className="char"
-                style={{ ["--i" as string]: i + delay / 28 }}
-                aria-hidden
-              >
-                {char === " " ? " " : char}
+      {lines.map((line, lineIndex) => {
+        const words = line.split(" ");
+
+        // Character offset of each word within its line, counting the spaces.
+        const wordOffsets = words.reduce<number[]>(
+          (acc, word, i) => [...acc, acc[i] + [...word].length + 1],
+          [0],
+        );
+
+        return (
+          <span
+            key={`${line}-${lineIndex}`}
+            // Each line is its own block so the color applies per line and the
+            // overlapping leading stays intentional.
+            className={`block ${colors[lineIndex % colors.length]}`}
+          >
+            {words.map((word, wordIndex) => (
+              <span key={`${word}-${wordIndex}`}>
+                {/* Atomic word: cannot break mid-word. */}
+                <span className="inline-block">
+                  {[...word].map((char, charIndex) => {
+                    const i = lineOffsets[lineIndex] + wordOffsets[wordIndex] + charIndex;
+                    return (
+                      <span
+                        key={i}
+                        className="char"
+                        style={{ ["--i" as string]: i + delay / 28 }}
+                        aria-hidden
+                      >
+                        {char}
+                      </span>
+                    );
+                  })}
+                </span>
+                {/* Breakable space between words. */}
+                {wordIndex < words.length - 1 ? " " : null}
               </span>
-            );
-          })}
-        </span>
-      ))}
+            ))}
+          </span>
+        );
+      })}
     </Tag>
   );
 }

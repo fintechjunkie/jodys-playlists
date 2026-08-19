@@ -50,13 +50,17 @@ body {
 
 /*
  * Display type. The reference fixes sizes at 46/80/94/130/230px; these clamp()
- * ranges land on those values at desktop widths and collapse proportionally
+ * ranges approach those values at desktop widths and collapse proportionally
  * below, which is the responsive behavior it asks for. Line-height 0.70 and the
  * ultra-black weight are what make the blocks read as architectural.
+ *
+ * display-xl caps well under the reference's 230px: at that size any line longer
+ * than about nine characters overflows a 1440px page. The tight leading and
+ * heavy weight carry the effect, not the raw pixel count.
  */
 .display-xl {
   font-family: var(--font-display);
-  font-size: clamp(3.5rem, 15vw, 230px);
+  font-size: clamp(2.5rem, 10vw, 150px);
   line-height: 0.7;
   text-transform: uppercase;
 }
@@ -164,7 +168,68 @@ iframe {
   animation-duration: 52s;
 }
 
+/* ---------- About-the-creator reveal ----------
+ * A screenprint pass: the panel wipes in behind a hard edge, and the magenta
+ * registration layer slides into its offset position, echoing the deliberate
+ * misregistration in the cover art. No blur anywhere — this is offset printing,
+ * not a drop shadow.
+ */
+
+@keyframes backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes panel-wipe {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes registration-settle {
+  from {
+    opacity: 0;
+    transform: translate(-22px, 26px);
+  }
+  60% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: translate(14px, 14px);
+  }
+}
+
+.backdrop-in {
+  animation: backdrop-in 0.25s ease both;
+}
+
+.panel-wipe {
+  animation: panel-wipe 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 0.1s;
+}
+
+.registration-layer {
+  transform: translate(14px, 14px);
+  animation: registration-settle 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .backdrop-in,
+  .panel-wipe,
+  .registration-layer {
+    animation: none;
+  }
+  .panel-wipe {
+    clip-path: none;
+  }
   html {
     scroll-behavior: auto;
   }

@@ -2,14 +2,18 @@
 
 import { useEffect, useRef, useState } from "react";
 import { CREATOR, hasCreatorSpotify } from "@/lib/site";
+import { AnimatedTitle } from "./AnimatedTitle";
 
 /**
  * "About the playlist creator" — a trigger link plus a modal blurb about Jody
- * and a link to her Spotify artist page.
+ * and a link to her Spotify artist page. Appears on the home page and on every
+ * playlist page.
  *
- * Appears on the home page and on every playlist page. The Spotify link is
- * omitted entirely until a real artist URL is configured, so a placeholder
- * never ships as a dead link.
+ * The reveal is built as a screenprint pass rather than a fade: the panel wipes
+ * in behind a hard vertical edge, the magenta plate slides into a deliberate
+ * misregistration offset behind it, and the name sets itself letter by letter.
+ * The offset plate is a flat rectangle, not a shadow — no blur is involved,
+ * which keeps it inside the style reference's ban on depth effects.
  */
 export function AboutCreator({ className = "" }: { className?: string }) {
   const [open, setOpen] = useState(false);
@@ -56,9 +60,9 @@ export function AboutCreator({ className = "" }: { className?: string }) {
           role="dialog"
           aria-modal="true"
           aria-labelledby="creator-heading"
-          className="fixed inset-0 z-[60] flex items-center justify-center overflow-y-auto bg-forest-ink/90 px-6 py-20"
+          className="backdrop-in fixed inset-0 z-[60] flex items-center justify-center overflow-y-auto bg-forest-ink/90 px-6 py-20"
         >
-          {/* Backdrop click closes. The panel stops propagation below. */}
+          {/* Backdrop click closes. */}
           <button
             type="button"
             aria-label="Close"
@@ -67,41 +71,57 @@ export function AboutCreator({ className = "" }: { className?: string }) {
             className="absolute inset-0 cursor-default"
           />
 
-          <div className="relative w-full max-w-[720px] bg-warm-chalk p-8 sm:p-12">
-            <p className="label-micro mb-6 text-forest-ink">The playlist creator</p>
+          <div className="relative w-full max-w-[720px]">
+            {/* Offset magenta plate — the misregistered second pass. */}
+            <div
+              aria-hidden
+              className="registration-layer absolute inset-0 bg-lipstick-magenta"
+            />
 
-            <h2 id="creator-heading" className="display-sm mb-8 text-lipstick-magenta">
-              {CREATOR.name}
-            </h2>
+            <div className="panel-wipe relative border-[3px] border-forest-ink bg-warm-chalk p-8 sm:p-12">
+              <p className="label-micro mb-6 text-forest-ink">The playlist creator</p>
 
-            <p className="mb-6 max-w-[60ch] text-[14px] font-medium uppercase tracking-[0.1em] text-forest-ink/70">
-              {CREATOR.role}
-            </p>
+              <AnimatedTitle
+                lines={[CREATOR.name]}
+                as="h2"
+                className="display-sm mb-8"
+                delay={200}
+              />
+              {/* AnimatedTitle sets its own aria-label; this id is what the
+                  dialog points at for its accessible name. */}
+              <span id="creator-heading" className="sr-only">
+                {CREATOR.name}
+              </span>
 
-            <p className="max-w-[60ch] text-[20px] leading-[1.2] text-forest-ink">
-              {CREATOR.blurb}
-            </p>
+              <p className="mb-6 max-w-[60ch] text-[13px] font-medium uppercase tracking-[0.1em] text-forest-ink/70">
+                {CREATOR.role}
+              </p>
 
-            <div className="mt-10 flex flex-wrap items-center gap-4">
-              {hasCreatorSpotify() ? (
-                <a
-                  href={CREATOR.spotifyArtistUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="rounded-full bg-blush-cream px-[15px] py-[7px] text-[14px] font-medium text-forest-ink transition-colors hover:bg-lipstick-magenta hover:text-warm-chalk"
+              <p className="max-w-[60ch] text-[20px] leading-[1.2] text-forest-ink">
+                {CREATOR.blurb}
+              </p>
+
+              <div className="mt-10 flex flex-wrap items-center gap-5">
+                {hasCreatorSpotify() ? (
+                  <a
+                    href={CREATOR.spotifyArtistUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="border-2 border-forest-ink bg-forest-ink px-5 py-2.5 text-[14px] font-semibold text-warm-chalk transition-colors hover:bg-lipstick-magenta hover:border-lipstick-magenta"
+                  >
+                    {CREATOR.name} on Spotify ↗
+                  </a>
+                ) : null}
+
+                <button
+                  ref={closeRef}
+                  type="button"
+                  onClick={() => setOpen(false)}
+                  className="label-micro text-lipstick-magenta underline decoration-1 underline-offset-4 hover:text-forest-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lipstick-magenta"
                 >
-                  {CREATOR.name} on Spotify ↗
-                </a>
-              ) : null}
-
-              <button
-                ref={closeRef}
-                type="button"
-                onClick={() => setOpen(false)}
-                className="label-micro text-lipstick-magenta underline decoration-1 underline-offset-4 hover:text-forest-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lipstick-magenta"
-              >
-                Close
-              </button>
+                  Close
+                </button>
+              </div>
             </div>
           </div>
         </div>

@@ -42,3 +42,6 @@ next-env.d.ts
 
 # local env
 .env*.local
+
+# Generated cover assets — rebuild with `npm run covers` from art/inbox/
+/art/spotify/*.jpg
