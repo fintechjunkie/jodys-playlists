@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getPlaylist, livePlaylists, trackCount } from "@/lib/playlists";
+import { getPlaylist, livePlaylists, titleLines, trackCount } from "@/lib/playlists";
 import { embeddableSource } from "@/lib/providers";
 import { playlistUrl, SITE_NAME } from "@/lib/site";
+import { AboutCreator } from "@/components/AboutCreator";
 import { AnimatedTitle } from "@/components/AnimatedTitle";
 import { Cover } from "@/components/Cover";
 import { PlayerEmbed } from "@/components/PlayerEmbed";
@@ -54,13 +55,15 @@ export default async function PlaylistPage({ params }: Params) {
       <div className="mx-auto max-w-[1440px] px-6 sm:px-15">
         {/* Hero: the title arrives letter by letter, bottom-anchored, no image
             competing with it. The type is the layout. */}
-        <header className="flex min-h-[78vh] flex-col justify-end pb-15 pt-40">
+        <header className="flex min-h-[56vh] flex-col justify-end pb-10 pt-32">
           <p className="label-micro mb-8 text-forest-ink">
             {count} tracks · {playlist.acts.length} acts
             {playlist.duration ? ` · ${playlist.duration}` : ""}
           </p>
 
-          <AnimatedTitle text={playlist.title} className="display-lg text-lipstick-magenta" />
+          {/* Lines are color-cycled: at line-height 0.70 they overlap, so
+              consecutive lines must differ in color to stay legible. */}
+          <AnimatedTitle lines={titleLines(playlist)} className="display-lg" />
         </header>
       </div>
 
@@ -70,7 +73,7 @@ export default async function PlaylistPage({ params }: Params) {
 
       <div className="mx-auto max-w-[1440px] px-6 sm:px-15">
         {/* The pitch. This is what someone reads before deciding to press play. */}
-        <section className="flex flex-col gap-12 pt-30 sm:flex-row sm:gap-15">
+        <section className="flex flex-col gap-10 pt-20 sm:flex-row sm:gap-12">
           <div className="w-full max-w-[320px] shrink-0">
             <Cover playlist={playlist} priority sizes="(max-width: 640px) 90vw, 320px" />
           </div>
@@ -81,6 +84,8 @@ export default async function PlaylistPage({ params }: Params) {
             </p>
 
             <SourceLinks sources={playlist.sources} />
+
+            <AboutCreator />
 
             {playlist.tags?.length ? (
               <ul className="flex flex-wrap gap-2">
@@ -98,27 +103,27 @@ export default async function PlaylistPage({ params }: Params) {
         </section>
 
         {embed ? (
-          <section className="pt-30">
+          <section className="pt-20">
             <p className="label-micro mb-8 text-lipstick-magenta">Listen</p>
             <PlayerEmbed source={embed} />
           </section>
         ) : null}
 
-        <section aria-label="Tracklist" className="pt-30">
+        <section aria-label="Tracklist" className="pt-20">
           <p className="label-micro mb-8 text-forest-ink">
             {playlist.acts.length} {playlist.acts.length === 1 ? "act" : "acts"}, in order
           </p>
           <AnimatedTitle
-            text="The sequence"
+            lines={["The sequence"]}
             as="h2"
-            className="display-md mb-30 text-lipstick-magenta"
+            className="display-md mb-12"
           />
           <Tracklist acts={playlist.acts} />
         </section>
 
         <Link
           href="/"
-          className="label-micro mt-30 inline-block text-lipstick-magenta hover:text-forest-ink"
+          className="label-micro mt-20 inline-block text-lipstick-magenta hover:text-forest-ink"
         >
           ← All playlists
         </Link>

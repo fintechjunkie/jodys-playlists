@@ -144,10 +144,12 @@ iframe {
   transition-delay: calc(var(--i) * 18ms);
 }
 
-/* Index rows: sweep the title into magenta letter by letter on hover. */
+/* Index rows: sweep the title into forest ink letter by letter on hover.
+   Titles now sit in cycling pinks, so green is the contrast that reads —
+   sweeping to magenta would flatten the per-line color distinction. */
 .title-sweep:hover .char,
 .title-sweep:focus-visible .char {
-  color: var(--color-lipstick-magenta);
+  color: var(--color-forest-ink);
 }
 
 /* The faded echo band that drifts behind a hero title. */

@@ -1,4 +1,5 @@
 import { livePlaylists } from "@/lib/playlists";
+import { AboutCreator } from "@/components/AboutCreator";
 import { AnimatedTitle } from "@/components/AnimatedTitle";
 import { PlaylistRow } from "@/components/PlaylistRow";
 import { TitleMarquee } from "@/components/TitleMarquee";
@@ -8,28 +9,27 @@ export default function Home() {
 
   return (
     <div className="mx-auto max-w-[1440px] px-6 sm:px-15">
-      {/* One idea per screen: the hero is a typographic statement, nothing else. */}
-      <section className="flex min-h-[82vh] flex-col justify-end pb-30 pt-40">
+      {/* One idea per screen: the hero is a typographic statement, nothing else.
+          The two lines overlap at line-height 0.70, so they carry different
+          colors from the cycle — that separation is what makes it readable. */}
+      <section className="flex min-h-[72vh] flex-col justify-end pb-20 pt-32">
         <p className="label-micro mb-8 text-forest-ink">Sequenced, not shuffled</p>
 
-        <AnimatedTitle text="Playlists" className="display-xl text-lipstick-magenta" />
-        <AnimatedTitle
-          text="worth the drive"
-          className="display-xl text-bubblegum"
-          delay={280}
-        />
+        <AnimatedTitle lines={["Playlists", "worth the drive"]} className="display-xl" />
 
-        <p className="mt-15 max-w-[60ch] text-[20px] leading-[1.2] text-forest-ink">
+        <p className="mt-12 max-w-[60ch] text-[20px] leading-[1.2] text-forest-ink">
           {all.length} playlists, each built as a set of acts with the running order
           explained. Play them here or take them to Spotify, Apple Music or YouTube.
         </p>
+
+        <AboutCreator className="mt-8" />
       </section>
 
       {/* Faded echo of the statement above, drifting. Decorative only. */}
       <TitleMarquee text="worth the drive —" className="text-blush-cream" />
 
-      <section aria-label="All playlists" className="pt-30">
-        <p className="label-micro mb-12 text-lipstick-magenta">The index</p>
+      <section aria-label="All playlists" className="pt-20">
+        <p className="label-micro mb-8 text-lipstick-magenta">The index</p>
 
         {all.length === 0 ? (
           <p className="text-[20px] text-forest-ink">No playlists yet.</p>

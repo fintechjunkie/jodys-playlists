@@ -50,6 +50,15 @@ export type Act = {
 export type Playlist = {
   slug: string;
   title: string;
+  /**
+   * The title broken into display lines. Required for anything that wraps.
+   *
+   * Display type runs at line-height 0.70, so lines physically overlap and
+   * each one gets a different color from the cycle. Where the break falls is
+   * therefore a design decision, not something to leave to auto-wrap. Falls
+   * back to the whole title on one line if omitted.
+   */
+  titleLines?: string[];
   /** One short line for the card. Keep it under ~70 characters. */
   tagline: string;
   /** The full pitch, shown on the playlist page. Blank lines make paragraphs. */
@@ -79,6 +88,7 @@ export const playlists: Playlist[] = [
   {
     slug: "actually-scary",
     title: "Halloween Party, Actually Scary",
+    titleLines: ["Halloween", "Party,", "Actually", "Scary"],
     tagline: "No Monster Mash. No Thriller. Twenty six songs that feel like the night.",
     description:
       "No Monster Mash. No Thriller. Twenty six songs that actually feel like the night.\n\nSequenced from dusk to after midnight, so just press play and let it run the room.",
@@ -152,6 +162,7 @@ export const playlists: Playlist[] = [
   {
     slug: "revenge-dressing",
     title: "Revenge Dressing",
+    titleLines: ["Revenge", "Dressing"],
     tagline: "For the night you're getting ready and you already know.",
     description:
       "For the night you're getting ready and you already know. Twenty six songs sequenced from first coat of mascara to walking out the door.\n\nConfidence, not closure.",
@@ -241,6 +252,11 @@ export function livePlaylists(): Playlist[] {
 
 export function getPlaylist(slug: string): Playlist | undefined {
   return livePlaylists().find((p) => p.slug === slug);
+}
+
+/** Display lines for a title, falling back to a single line. */
+export function titleLines(playlist: Playlist): string[] {
+  return playlist.titleLines ?? [playlist.title];
 }
 
 export function trackCount(playlist: Playlist): number {

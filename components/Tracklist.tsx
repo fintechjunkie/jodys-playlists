@@ -5,8 +5,11 @@ import { OWN_ARTIST } from "@/lib/site";
  * The acts, in order, with continuous track numbering across act boundaries —
  * so track 14 is the 14th song you hear, not the 2nd song of act III.
  *
- * Each act is headed by an oversized numeral and its note; the note is the
- * product, so it gets body-size type rather than caption treatment.
+ * Spacing is deliberately tight here. The rest of the site breathes at 120px
+ * section gaps, but this is a 26-row list someone is scanning: the act headers
+ * carry the hierarchy, so the whitespace between rows doesn't have to. The
+ * oversized act numeral sits beside the title rather than above it, which buys
+ * emphasis without buying vertical space.
  */
 export function Tracklist({ acts }: { acts: Act[] }) {
   // Track number each act starts at.
@@ -16,16 +19,26 @@ export function Tracklist({ acts }: { acts: Act[] }) {
   );
 
   return (
-    <div className="flex flex-col gap-30">
+    <div className="flex flex-col gap-16">
       {acts.map((act, actIndex) => {
         const start = offsets[actIndex];
 
         return (
-          <section key={`${act.number}-${act.title}`} className="flex flex-col gap-8">
-            <header className="flex flex-col gap-4">
-              <p className="label-micro text-lipstick-magenta">Act {act.number}</p>
-              <h3 className="display-sm text-forest-ink">{act.title}</h3>
-              <p className="max-w-[60ch] text-[20px] leading-[1.2] text-forest-ink">
+          <section key={`${act.number}-${act.title}`} className="flex flex-col gap-4">
+            <header className="border-b-2 border-lipstick-magenta pb-3">
+              <div className="flex items-baseline gap-4">
+                <span
+                  aria-hidden
+                  className="display-md shrink-0 text-bubblegum"
+                >
+                  {act.number}
+                </span>
+                <h3 className="display-sm text-lipstick-magenta">
+                  <span className="sr-only">Act {act.number}. </span>
+                  {act.title}
+                </h3>
+              </div>
+              <p className="mt-2 max-w-[60ch] text-[20px] leading-[1.2] text-forest-ink">
                 {act.note}
               </p>
             </header>
@@ -37,23 +50,23 @@ export function Tracklist({ acts }: { acts: Act[] }) {
                 return (
                   <li
                     key={`${track.artist}-${track.title}`}
-                    className="flex items-baseline gap-5 border-t border-blush-cream py-3 last:border-b last:border-b-blush-cream"
+                    className="flex items-baseline gap-4 border-b border-blush-cream py-1.5"
                   >
-                    <span className="w-7 shrink-0 text-right text-[12px] tabular-nums text-lipstick-magenta">
+                    <span className="w-6 shrink-0 text-right text-[12px] tabular-nums text-lipstick-magenta">
                       {start + i + 1}
                     </span>
 
-                    <span className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                    <span className="flex flex-wrap items-baseline gap-x-3">
                       <span
-                        className={`text-[20px] leading-[1.2] ${
+                        className={`text-[16px] leading-[1.25] ${
                           isOwn ? "font-bold text-lipstick-magenta" : "text-forest-ink"
                         }`}
                       >
                         {track.title}
                       </span>
-                      <span className="text-[14px] text-forest-ink/70">{track.artist}</span>
+                      <span className="text-[13px] text-forest-ink/70">{track.artist}</span>
                       {isOwn ? (
-                        <span className="rounded-full bg-blush-cream px-[10px] py-[3px] text-[10px] font-medium uppercase tracking-[0.14em] text-forest-ink">
+                        <span className="rounded-full bg-blush-cream px-[8px] py-[1px] text-[10px] font-medium uppercase tracking-[0.12em] text-forest-ink">
                           Jody
                         </span>
                       ) : null}

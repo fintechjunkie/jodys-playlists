@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { trackCount, type Playlist } from "@/lib/playlists";
+import { titleLines, trackCount, type Playlist } from "@/lib/playlists";
 import { PROVIDER_LABEL } from "@/lib/providers";
 import { AnimatedTitle } from "./AnimatedTitle";
 import { Cover } from "./Cover";
@@ -26,27 +26,27 @@ export function PlaylistRow({
   return (
     <Link
       href={`/${playlist.slug}`}
-      className="title-sweep group block border-t border-blush-cream py-12 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-lipstick-magenta sm:py-15"
+      className="title-sweep group block border-t border-blush-cream py-10 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-lipstick-magenta"
     >
-      <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:gap-12">
+      <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:gap-10">
         {/* Asymmetric: image left, type right, never centered. */}
-        <div className="w-full max-w-[260px] shrink-0">
+        <div className="w-full max-w-[220px] shrink-0">
           <Cover
             playlist={playlist}
             priority={priority}
-            sizes="(max-width: 640px) 90vw, 260px"
+            sizes="(max-width: 640px) 90vw, 220px"
           />
         </div>
 
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-4">
           <p className="label-micro text-lipstick-magenta">
             {String(index + 1).padStart(2, "0")} — {count} tracks · {playlist.acts.length} acts
           </p>
 
           <AnimatedTitle
-            text={playlist.title}
+            lines={titleLines(playlist)}
             as="h2"
-            className="display-md text-forest-ink"
+            className="display-md"
             delay={index * 90}
           />
 
