@@ -4,22 +4,19 @@
  *   Drop raw art in  art/inbox/<slug>.(png|jpg|jpeg|webp)
  *   Run              npm run covers
  *
- * For each file whose name matches a playlist slug it writes two assets:
+ * For each file whose name matches a playlist slug it writes the SAME titled
+ * composition at two sizes:
  *
- *   public/covers/<slug>.jpg        1600px, NO text — used by the site, which
- *                                   already sets the title in huge type right
- *                                   beside the image.
- *   art/spotify/<slug>-cover.jpg    3000px, WITH the title burned in — for
- *                                   uploading to Spotify/Apple, where there is
- *                                   no surrounding layout to carry the name.
+ *   public/covers/<slug>.jpg       used by the site
+ *   art/spotify/<slug>-cover.jpg   full size, for uploading to Spotify/Apple
  *
- * The title is set in Anton (the same face the site uses) on a flat band in a
- * brand color, because we can't know where the artwork leaves empty space —
- * a band guarantees legibility over any composition. Flat fill, no gradient,
- * per the style reference.
+ * The artwork is drawn leaving the lower part of the frame clear, so the title
+ * sets directly onto empty paper rather than onto a colour band. That clear
+ * height differs from cover to cover, so it is MEASURED per image (see
+ * `clearZoneTop`) and the type is fitted to whatever room actually exists —
+ * a fixed band height would either crop into the art or waste space.
  *
- * Playlist titles and line breaks come from lib/playlists.ts, so the covers can
- * never drift from the site.
+ * Titles come from lib/playlists.ts, so the covers cannot drift from the site.
  */
 
 import { createCanvas, GlobalFonts, loadImage } from "@napi-rs/canvas";
@@ -36,30 +33,26 @@ const SITE_OUT = path.join(ROOT, "public", "covers");
 const FONTS = path.join(ROOT, "art", "fonts");
 
 // Palette — must match app/globals.css.
-const WARM_CHALK = "#fff8f6";
-const LIPSTICK_MAGENTA = "#db3c8a";
-const FOREST_INK = "#00522d";
+const INK = {
+  magenta: "#db3c8a",
+  forest: "#00522d",
+};
 
-// Target sizes. Actual output is capped at the source resolution — upscaling
-// adds no detail and visibly softens the halftone texture these covers depend
-// on, so a 1254px original ships at 1254px rather than pretending to be 3000.
 const SPOTIFY_SIZE = 3000;
 const SITE_SIZE = 1600;
+
+const ACCEPTED = new Set([".png", ".jpg", ".jpeg", ".webp"]);
+
+GlobalFonts.registerFromPath(path.join(FONTS, "Anton-Regular.ttf"), "AntonCover");
 
 /** Output size for a target, never exceeding what the source actually has. */
 function outputSize(target, image) {
   return Math.min(target, Math.min(image.width, image.height));
 }
 
-const ACCEPTED = new Set([".png", ".jpg", ".jpeg", ".webp"]);
-
-GlobalFonts.registerFromPath(path.join(FONTS, "Anton-Regular.ttf"), "AntonCover");
-GlobalFonts.registerFromPath(path.join(FONTS, "Inter-SemiBold.ttf"), "InterCover");
-
 /**
- * Draw `image` to fill a square of `size`, cropping the overflowing axis
- * equally on both sides. Generated art is usually already square, but a hand
- * crop or a 4:5 export shouldn't silently stretch.
+ * Draw `image` to fill a square of `size`, cropping the overflowing axis equally
+ * on both sides.
  */
 function drawSquareCropped(ctx, image, size) {
   const scale = Math.max(size / image.width, size / image.height);
@@ -68,15 +61,74 @@ function drawSquareCropped(ctx, image, size) {
   ctx.drawImage(image, (size - w) / 2, (size - h) / 2, w, h);
 }
 
+/** Downscaled pixel data, used for paper sampling and zone measurement. */
+function sample(image, width) {
+  const h = Math.round((image.height / image.width) * width);
+  const c = createCanvas(width, h);
+  const ctx = c.getContext("2d");
+  ctx.drawImage(image, 0, 0, width, h);
+  return { data: ctx.getImageData(0, 0, width, h).data, width, height: h };
+}
+
 /**
- * Break `words` into exactly `count` lines such that the WIDEST line is as
- * narrow as possible.
+ * The paper colour, averaged from the bottom-left corner.
  *
- * Minimizing the widest rendered line is the same thing as maximizing the font
- * size that will fit, which is the actual goal. Titles are a handful of words,
- * so every possible set of break points is checked rather than approximated —
- * a greedy packer produces lopsided breaks like "HALLOWEEN / PARTY, ACTUALLY
- * SCARY" that waste most of the width.
+ * Not assumed to be the site's warm chalk: this art carries its own paper tone
+ * and visible grain, so the measurement below compares against the real ground.
+ */
+function paperColor({ data, width, height }) {
+  let r = 0, g = 0, b = 0, n = 0;
+  const boxW = Math.max(2, Math.round(width * 0.06));
+  const boxH = Math.max(2, Math.round(height * 0.06));
+  for (let y = height - boxH; y < height; y += 1) {
+    for (let x = 0; x < boxW; x += 1) {
+      const i = (y * width + x) * 4;
+      r += data[i]; g += data[i + 1]; b += data[i + 2]; n += 1;
+    }
+  }
+  return [r / n, g / n, b / n];
+}
+
+/**
+ * Where the clear bottom band begins, in output pixels.
+ *
+ * Scans upward from the bottom and stops at the first row carrying enough
+ * non-paper pixels to count as artwork. Paper grain means a few stray pixels
+ * always differ, hence the tolerance and the per-row percentage.
+ */
+function clearZoneTop(image, size) {
+  const s = sample(image, 256);
+  const paper = paperColor(s);
+  // Thresholds measured against the real art rather than guessed: across all
+  // five covers, clear paper rows sit at 0.0-0.2% of pixels beyond a summed
+  // distance of 120, while the first artwork rows jump to 18-70%. A lower
+  // tolerance reads paper grain as artwork and collapses the zone to nothing.
+  const TOLERANCE = 40;   // summed distance/3 still counting as paper
+  const ROW_LIMIT = 0.03; // fraction of a row that may be art before we stop
+
+  let clearRows = 0;
+  for (let y = s.height - 1; y >= 0; y -= 1) {
+    let arty = 0;
+    for (let x = 0; x < s.width; x += 1) {
+      const i = (y * s.width + x) * 4;
+      const d =
+        Math.abs(s.data[i] - paper[0]) +
+        Math.abs(s.data[i + 1] - paper[1]) +
+        Math.abs(s.data[i + 2] - paper[2]);
+      if (d > TOLERANCE * 3) arty += 1;
+    }
+    if (arty / s.width > ROW_LIMIT) break;
+    clearRows += 1;
+  }
+
+  const clearFraction = clearRows / s.height;
+  return { top: Math.round(size * (1 - clearFraction)), clearFraction };
+}
+
+/**
+ * Break `words` into exactly `count` lines so the WIDEST line is as narrow as
+ * possible — the same thing as maximising the font size that fits. Every set of
+ * break points is checked; titles are only a few words.
  */
 function balanceLines(words, count, measure) {
   const n = words.length;
@@ -84,7 +136,6 @@ function balanceLines(words, count, measure) {
   if (count === 1) return [words.join(" ")];
 
   let best = null;
-
   const search = (start, need, breaks) => {
     if (need === 0) {
       const bounds = [0, ...breaks, n];
@@ -96,21 +147,16 @@ function balanceLines(words, count, measure) {
       if (!best || widest < best.widest) best = { lines, widest };
       return;
     }
-    // Leave at least one word for each line still to be filled.
     for (let i = start; i <= n - need; i += 1) search(i + 1, need - 1, [...breaks, i]);
   };
-
   search(1, count - 1, []);
   return best?.lines ?? null;
 }
 
 /**
- * Real line height for a block of text at a given size.
- *
- * Measured from glyph bounding boxes rather than derived from a ratio: Anton's
- * cap height is unusually large relative to its em box, so a guessed leading
- * (the site's 0.70 for instance) makes lines physically collide. The 1.08
- * multiplier is the gap between lines.
+ * Line height measured from real glyph bounding boxes rather than a ratio.
+ * Anton's cap height is unusually large relative to its em box, so a guessed
+ * leading makes lines physically collide.
  */
 function measuredLineHeight(ctx, lines, fontSize) {
   ctx.font = `${fontSize}px AntonCover`;
@@ -120,32 +166,27 @@ function measuredLineHeight(ctx, lines, fontSize) {
       return m.actualBoundingBoxAscent + m.actualBoundingBoxDescent;
     }),
   );
-  return Math.ceil(tallest * 1.08);
+  return Math.ceil(tallest * 1.06);
 }
 
 /**
- * Choose how to break the title and how big to set it.
- *
- * The site's authored line breaks are tuned for a narrow column at 130px; a
- * square cover is wide and short, so it wants its own breaks. We try every
- * plausible line count and keep whichever yields the largest type that still
- * fits both the width and the height budget.
+ * Pick the line break and size that fill the available box most fully. The site
+ * ships authored breaks tuned for a narrow column; a square cover is wide and
+ * short, so it gets its own.
  */
 function fitTitle(ctx, title, maxWidth, maxHeight) {
   const words = title.split(/\s+/);
   const PROBE = 400;
   let best = null;
 
-  for (let count = 1; count <= Math.min(4, words.length); count += 1) {
+  for (let count = 1; count <= Math.min(3, words.length); count += 1) {
     ctx.font = `${PROBE}px AntonCover`;
     const lines = balanceLines(words, count, (l) => ctx.measureText(l).width);
     if (!lines || lines.length !== count) continue;
 
-    ctx.font = `${PROBE}px AntonCover`;
     const widest = Math.max(...lines.map((l) => ctx.measureText(l).width));
     let fontSize = Math.floor((PROBE * maxWidth) / widest);
 
-    // Shrink until the measured block actually fits the height budget.
     let lineHeight = measuredLineHeight(ctx, lines, fontSize);
     if (lineHeight * count > maxHeight) {
       fontSize = Math.floor((fontSize * maxHeight) / (lineHeight * count));
@@ -154,109 +195,69 @@ function fitTitle(ctx, title, maxWidth, maxHeight) {
 
     if (!best || fontSize > best.fontSize) best = { lines, fontSize, lineHeight };
   }
-
   return best;
 }
 
-/** Suggest an `accent` value by finding the artwork's dominant saturated color. */
+/** Dominant saturated colour, suggested as the playlist's `accent`. */
 function dominantColor(image) {
-  const S = 48;
-  const probe = createCanvas(S, S);
-  const pctx = probe.getContext("2d");
-  pctx.drawImage(image, 0, 0, S, S);
-  const { data } = pctx.getImageData(0, 0, S, S);
-
+  const s = sample(image, 48);
   const buckets = new Map();
-  for (let i = 0; i < data.length; i += 4) {
-    const [r, g, b] = [data[i], data[i + 1], data[i + 2]];
+  for (let i = 0; i < s.data.length; i += 4) {
+    const [r, g, b] = [s.data[i], s.data[i + 1], s.data[i + 2]];
     const max = Math.max(r, g, b);
     const min = Math.min(r, g, b);
-    // Ignore the near-white paper ground and near-neutral pixels; we want the
-    // motif's color, which is what should sit behind the image while it loads.
-    if (max > 240 && min > 225) continue;
-    if (max - min < 30) continue;
+    // Skip the paper ground and near-neutral pixels; we want the motif.
+    // Saturation is the reliable test: this art's paper measures around
+    // rgb(250,237,220), only ~30 apart, while every motif colour is 80+ apart.
+    if (max - min < 45) continue;
 
     const key = `${r >> 4}-${g >> 4}-${b >> 4}`;
     const hit = buckets.get(key) ?? { n: 0, r: 0, g: 0, b: 0 };
-    hit.n += 1;
-    hit.r += r;
-    hit.g += g;
-    hit.b += b;
+    hit.n += 1; hit.r += r; hit.g += g; hit.b += b;
     buckets.set(key, hit);
   }
-
   if (buckets.size === 0) return null;
   const top = [...buckets.values()].sort((a, b) => b.n - a.n)[0];
-  const hex = (v) =>
-    Math.round(v / top.n)
-      .toString(16)
-      .padStart(2, "0");
+  const hex = (v) => Math.round(v / top.n).toString(16).padStart(2, "0");
   return `#${hex(top.r)}${hex(top.g)}${hex(top.b)}`;
 }
 
-async function renderTitled(image, playlist) {
-  const size = outputSize(SPOTIFY_SIZE, image);
+/** Composite one cover: artwork full-bleed, title set into the clear lower band. */
+async function render(image, playlist, size) {
   const canvas = createCanvas(size, size);
   const ctx = canvas.getContext("2d");
-
-  // Paper ground first, so any transparency in the source lands on cream
-  // rather than black.
-  ctx.fillStyle = WARM_CHALK;
-  ctx.fillRect(0, 0, size, size);
   drawSquareCropped(ctx, image, size);
 
+  const { top, clearFraction } = clearZoneTop(image, size);
   const margin = Math.round(size * 0.055);
+
+  // Floor of 18% of the frame, so the type never gets squeezed to nothing if a
+  // piece of art runs long — at the cost of slightly overlapping the artwork.
+  const available = Math.max(size * 0.18, size - top - margin * 2);
+
   ctx.textAlign = "left";
   ctx.textBaseline = "alphabetic";
 
-  // Re-break the title for a square frame rather than reusing the site's
-  // column breaks, and cap the block at 30% of the cover so the artwork stays
-  // the dominant element.
-  const { lines, fontSize, lineHeight } = fitTitle(
-    ctx,
-    playlist.title.toUpperCase(),
-    size - margin * 2,
-    size * 0.3,
-  );
+  const fit = fitTitle(ctx, playlist.title.toUpperCase(), size - margin * 2, available);
+  ctx.fillStyle = INK[playlist.coverInk ?? "forest"];
+  ctx.font = `${fit.fontSize}px AntonCover`;
 
-  const labelSize = Math.round(size * 0.019);
-  const blockHeight = lines.length * lineHeight;
-  const bandHeight = blockHeight + margin * 2 + labelSize * 2;
-  const bandTop = size - bandHeight;
-
-  ctx.fillStyle = playlist.coverBand === "magenta" ? LIPSTICK_MAGENTA : FOREST_INK;
-  ctx.fillRect(0, bandTop, size, bandHeight);
-
-  // Micro-label, so the cover is identifiable as part of the set on a platform
-  // that shows no other branding.
-  ctx.fillStyle = WARM_CHALK;
-  ctx.globalAlpha = 0.75;
-  ctx.font = `${labelSize}px InterCover`;
-  const label = "JODY'S PLAYLISTS";
-  ctx.letterSpacing = `${Math.round(labelSize * 0.16)}px`;
-  ctx.fillText(label, margin, bandTop + margin * 0.75 + labelSize);
-  ctx.letterSpacing = "0px";
-  ctx.globalAlpha = 1;
-
-  ctx.font = `${fontSize}px AntonCover`;
-  let cursor = bandTop + margin * 0.75 + labelSize * 2.1;
-  for (const line of lines) {
+  // Bottom-anchored: the last line sits on the bottom margin.
+  const blockHeight = fit.lines.length * fit.lineHeight;
+  let cursor = size - margin - blockHeight;
+  for (const line of fit.lines) {
     const ascent = ctx.measureText(line).actualBoundingBoxAscent;
     ctx.fillText(line, margin, cursor + ascent);
-    cursor += lineHeight;
+    cursor += fit.lineHeight;
   }
 
-  return { buffer: await canvas.encode("jpeg", 92), fontSize, lines, size };
-}
-
-async function renderPlain(image) {
-  const size = outputSize(SITE_SIZE, image);
-  const canvas = createCanvas(size, size);
-  const ctx = canvas.getContext("2d");
-  ctx.fillStyle = WARM_CHALK;
-  ctx.fillRect(0, 0, size, size);
-  drawSquareCropped(ctx, image, size);
-  return { buffer: await canvas.encode("jpeg", 90), size };
+  return {
+    buffer: await canvas.encode("jpeg", 92),
+    size,
+    fontSize: fit.fontSize,
+    lines: fit.lines,
+    clearPct: Math.round(clearFraction * 100),
+  };
 }
 
 async function main() {
@@ -272,55 +273,52 @@ async function main() {
   }
 
   const art = entries.filter((f) => ACCEPTED.has(path.extname(f).toLowerCase()));
+  const bySlug = new Map(livePlaylists().map((p) => [p.slug, p]));
+
   if (art.length === 0) {
-    console.log(`Nothing to do — drop art in art/inbox/ named <slug>.png or .jpg`);
-    console.log(`Slugs awaiting art: ${livePlaylists().map((p) => p.slug).join(", ")}`);
+    console.log("Nothing to do — drop art in art/inbox/ named <slug>.png or .jpg");
+    console.log(`Slugs: ${[...bySlug.keys()].join(", ")}`);
     return;
   }
 
-  const bySlug = new Map(livePlaylists().map((p) => [p.slug, p]));
   let made = 0;
-
   for (const file of art) {
     const slug = path.basename(file, path.extname(file));
     const playlist = bySlug.get(slug);
 
     if (!playlist) {
       console.warn(
-        `SKIP ${file} — "${slug}" is not a playlist slug. Expected one of: ${[...bySlug.keys()].join(", ")}`,
+        `SKIP ${file} — "${slug}" is not a playlist slug. Expected: ${[...bySlug.keys()].join(", ")}`,
       );
       continue;
     }
 
     const image = await loadImage(path.join(INBOX, file));
-    if (Math.min(image.width, image.height) < SPOTIFY_SIZE) {
-      console.log(
-        `  note     source is ${image.width}x${image.height}; output capped there rather than upscaled to ${SPOTIFY_SIZE}`,
-      );
-    }
+    const spotify = await render(image, playlist, outputSize(SPOTIFY_SIZE, image));
+    const site = await render(image, playlist, outputSize(SITE_SIZE, image));
 
-    const titled = await renderTitled(image, playlist);
-    await writeFile(path.join(SPOTIFY_OUT, `${slug}-cover.jpg`), titled.buffer);
-    const plain = await renderPlain(image);
-    await writeFile(path.join(SITE_OUT, `${slug}.jpg`), plain.buffer);
+    await writeFile(path.join(SPOTIFY_OUT, `${slug}-cover.jpg`), spotify.buffer);
+    await writeFile(path.join(SITE_OUT, `${slug}.jpg`), site.buffer);
 
     const suggested = dominantColor(image);
     made += 1;
 
     console.log(`\n${playlist.title}`);
-    console.log(`  site     public/covers/${slug}.jpg          ${plain.size}px, no text`);
-    console.log(`  spotify  art/spotify/${slug}-cover.jpg   ${titled.size}px, title at ${titled.fontSize}px`);
-    console.log(`  title    ${titled.lines.join(" / ")}`);
-    console.log(`  band     ${playlist.coverBand ?? "forest"}`);
-    if (suggested) {
-      console.log(`  suggest  accent: "${suggested}"  <- paste into lib/playlists.ts`);
+    console.log(`  clear zone  bottom ${spotify.clearPct}% of frame (measured)`);
+    console.log(
+      `  title       ${spotify.lines.join(" / ")}  @ ${spotify.fontSize}px, ${playlist.coverInk ?? "forest"} ink`,
+    );
+    console.log(`  site        public/covers/${slug}.jpg  ${site.size}px`);
+    console.log(`  spotify     art/spotify/${slug}-cover.jpg  ${spotify.size}px`);
+    if (suggested && suggested !== playlist.accent) {
+      console.log(`  accent      ${playlist.accent} -> suggest "${suggested}"`);
     }
     if (playlist.cover !== `/covers/${slug}.jpg`) {
-      console.log(`  ACTION   set cover: "/covers/${slug}.jpg" in lib/playlists.ts (currently "${playlist.cover}")`);
+      console.log(`  ACTION      set cover: "/covers/${slug}.jpg" (currently "${playlist.cover}")`);
     }
   }
 
-  console.log(`\nDone — ${made} cover${made === 1 ? "" : "s"} generated.`);
+  console.log(`\nDone — ${made} cover${made === 1 ? "" : "s"}.`);
 }
 
 await main();

@@ -30,6 +30,17 @@ bracketed parts get swapped.
 > editorial risograph poster aesthetic. High contrast. Must read clearly at
 > thumbnail size.
 
+**Composition requirement — append this to every prompt:**
+
+> The bottom 25–30% of the square is empty paper ground with nothing in it, no
+> artwork and no texture beyond the paper grain. The motif occupies only the
+> upper portion of the frame.
+
+That empty band is where `npm run covers` sets the title. The script measures the
+clear band per image and fits the type to whatever room it finds, so this doesn't
+need to be exact — but art running to the bottom edge leaves nowhere for the
+title and forces it to overlap the motif.
+
 **Negative prompt (append to all):**
 
 > no text, no letters, no words, no typography, no logos, no watermark, no
@@ -173,7 +184,7 @@ household chores, hardcore soundtrack. Not a cute cleaning icon.
 **Alternate motifs:** a scrub brush in strict profile, bristles down · a spray
 bottle with the trigger forward · a crushed aluminum can · a mop head.
 
-**Band:** magenta (the motif is green).
+**Ink:** magenta (the motif is green).
 
 ---
 
@@ -202,7 +213,7 @@ that stopped existing, so it carries the year without saying it.
 **Alternate motifs:** a car key on a single keyring · a stack of festival
 wristbands · a folded paper note · a lanyard hanging straight down.
 
-**Band:** forest (the motif is pink).
+**Ink:** forest (the motif is pink).
 
 ---
 
@@ -233,7 +244,7 @@ even though the sequence ends somewhere steadier.
 **Alternate motifs:** a closed door seen straight on · a single unmatched
 earring · a calendar page torn at one corner · a burnt match.
 
-**Band:** magenta (the motif is green).
+**Ink:** magenta (the motif is green).
 
 ---
 
@@ -285,12 +296,17 @@ No two neighbors share a color. If you reorder the playlists, re-check this.
   color]** — it's the flat color shown behind the image while it loads, so
   matching the artwork keeps the page from flashing.
 
-## One deliberate choice: no type on the covers
+## Type is added afterward, not generated
 
-The covers carry no text. Two reasons: image generators render lettering badly,
-and the site already sets every title in huge condensed display type directly
-beside the cover — repeating it inside the image just competes with itself.
+The covers carry no lettering **as generated** — image models render type badly.
+The title is composited on afterward by `npm run covers`, set in Anton, the same
+face the site uses.
 
-If you want type on the covers for Spotify (where there's no surrounding
-layout), add it afterward in a real design tool using **Anton**, uppercase,
-tight leading, in the motif's color. Don't ask the generator to do it.
+That means one thing matters when you generate art: **leave the bottom 25-30% of
+the frame as empty paper.** The script measures the clear band in each image and
+fits the type to whatever room it finds, so you do not have to be precise — but
+art running to the bottom edge leaves nowhere for the title and it will be forced
+to overlap.
+
+Ink colour per playlist is `coverInk` in `lib/playlists.ts`, either `magenta` or
+`forest`. Choose the one that contrasts with the motif.

@@ -83,11 +83,11 @@ export type Playlist = {
    */
   accent: string;
   /**
-   * Band color for the titled Spotify cover that `npm run covers` generates.
-   * Pick the one that CONTRASTS with the artwork's motif — a magenta band
-   * against a magenta motif merges into a single blob at thumbnail size.
+   * Ink color for the title that `npm run covers` burns into the cover.
+   * Pick the one that CONTRASTS with the artwork's motif — magenta type against
+   * a magenta motif disappears at thumbnail size.
    */
-  coverBand?: "magenta" | "forest";
+  coverInk?: "magenta" | "forest";
   acts: Act[];
   /**
    * What each act header is called: "Act I", or "Minutes 12-30" for a
@@ -117,8 +117,8 @@ export const playlists: Playlist[] = [
     description:
       "No Monster Mash. No Thriller. Twenty six songs that actually feel like the night.\n\nSequenced from dusk to after midnight, so just press play and let it run the room.",
     cover: "/covers/actually-scary.jpg",
-    accent: "#034325",
-    coverBand: "magenta",
+    accent: "#05462b",
+    coverInk: "magenta",
     tags: ["halloween", "goth", "industrial", "party"],
     published: "2026-08-19",
     sources: [
@@ -195,8 +195,8 @@ export const playlists: Playlist[] = [
     description:
       "For the night you're getting ready and you already know. Twenty six songs sequenced from first coat of mascara to walking out the door.\n\nConfidence, not closure.",
     cover: "/covers/revenge-dressing.jpg",
-    accent: "#ec2976",
-    coverBand: "forest",
+    accent: "#f12c72",
+    coverInk: "forest",
     tags: ["pop", "hype", "getting ready", "confidence"],
     published: "2026-08-19",
     sources: [
@@ -273,10 +273,9 @@ export const playlists: Playlist[] = [
     tagline: "Forty seven minutes. Kitchen, bathroom, floors. Don't stop.",
     description:
       "Forty seven minutes. Kitchen, bathroom, floors. Do not stop when the first song ends. Twelve tracks sequenced so you're moving fastest at minute thirty.\n\nFree.",
-    // TODO: no artwork yet. See docs/cover-art-prompts.md, then run `npm run covers`.
-    cover: "/covers/placeholder.svg",
-    accent: "#00522d",
-    coverBand: "magenta",
+    cover: "/covers/rage-clean.jpg",
+    accent: "#024b2b",
+    coverInk: "magenta",
     // The runtime IS the hook, so it goes on the page.
     duration: "47 min",
     // Time blocks rather than numbered acts.
@@ -329,10 +328,9 @@ export const playlists: Playlist[] = [
     tagline: "Twenty two songs that put you back in a car you no longer own.",
     description:
       "Twenty two songs that put you back in a car you no longer own. Play it loud enough that it's embarrassing.\n\nFree.",
-    // TODO: no artwork yet. See docs/cover-art-prompts.md, then run `npm run covers`.
-    cover: "/covers/placeholder.svg",
-    accent: "#e878b2",
-    coverBand: "forest",
+    cover: "/covers/seventeen-again.jpg",
+    accent: "#ec6697",
+    coverInk: "forest",
     tags: ["nostalgia", "pop punk", "emo", "throwback"],
     published: "2026-08-19",
     // TODO: add the Spotify playlist once it exists.
@@ -396,10 +394,9 @@ export const playlists: Playlist[] = [
     tagline: "Twenty four songs for the first week. Wreckage toward steadier.",
     description:
       "Twenty four songs for the first week. Sequenced from wreckage toward something steadier. It gets easier around track sixteen.\n\nFree.",
-    // TODO: no artwork yet. See docs/cover-art-prompts.md, then run `npm run covers`.
-    cover: "/covers/placeholder.svg",
-    accent: "#00522d",
-    coverBand: "magenta",
+    cover: "/covers/no-contact.jpg",
+    accent: "#034629",
+    coverInk: "magenta",
     tags: ["heartbreak", "breakup", "healing", "sad"],
     published: "2026-08-19",
     // TODO: add the Spotify playlist once it exists.
