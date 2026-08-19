@@ -45,3 +45,6 @@ next-env.d.ts
 
 # Generated cover assets — rebuild with `npm run covers` from art/inbox/
 /art/spotify/*.jpg
+
+# Generated pins — rebuild with `npm run pins` from art/pins/inbox/
+/art/pins/out/*.jpg
