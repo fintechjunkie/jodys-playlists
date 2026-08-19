@@ -3,6 +3,26 @@
 Next.js 16 + Tailwind 4, deployed on Vercel. Every playlist is prerendered as
 static HTML at build time, so the site is fast and costs nothing to serve.
 
+## Image assets — covers and pins
+
+Two commands produce every image asset. Both depend on typefaces committed under
+`art/fonts/` — **do not delete them**, or the pipelines emit untitled output.
+
+```bash
+npm run covers              # art/inbox      -> public/covers + art/spotify
+npm run pins                # art/pins/inbox -> art/pins/out
+npm run pins -- --variants  # treatment mockups for review
+```
+
+**[docs/ASSET-PIPELINE.md](docs/ASSET-PIPELINE.md) is the authoritative record** —
+the locked typefaces and why they were chosen, and every threshold that was arrived
+at by measuring the real artwork rather than guessing. Read it before changing
+either script; several of the constants in there look arbitrary and are not.
+
+**[docs/pin-copy-library.md](docs/pin-copy-library.md)** holds all fifty supplied
+pin headlines, which are in use, and accuracy notes — including three lines that
+overstate the playlist runtime and should be fixed before they run as paid creative.
+
 ## Design system
 
 The visual language is the Agence Foudre editorial reference, vendored at
@@ -44,9 +64,14 @@ stillness everywhere else is what makes them read as deliberate.
 - [`TitleMarquee`](components/TitleMarquee.tsx) drifts a faded echo of the title
   sideways behind the hero. The track is duplicated and translated exactly -50%,
   so the loop is seamless with no JS measuring anything.
-- Index rows sweep their title into magenta letter by letter on hover
-  (`.title-sweep`). Hover recolor is a `transition`, not an `animation`, so it
-  never fights the entrance keyframes.
+- Index rows sweep their title from the pink cycle into a **green** cycle on hover,
+  letter by letter. The hover colours sit on each line (see `HOVER_COLORS` in
+  AnimatedTitle) and the characters inherit them, so one inherited colour change
+  still animates per character. It has to be a cycle for the same reason the resting
+  colours do: at line-height 0.70 the lines overlap, and sweeping every line to one
+  flat green makes a multi-line title merge into an unreadable mass.
+- Hover recolor is a `transition`, not an `animation`, so it never fights the
+  entrance keyframes.
 
 Everything above is disabled under `prefers-reduced-motion`. Keep it that way.
 
@@ -75,11 +100,11 @@ Notes:
   Changing it breaks every link already printed in an ad.
 - **`sources` may be empty.** The page then shows "streaming links are on the
   way" instead of dead buttons. Fill it in before you advertise the playlist.
-- **`cover`** can be a local file in `public/covers/` or a remote URL from a
-  provider CDN. Allowlisted hosts are in [`next.config.ts`](next.config.ts) —
-  add any others there, or Next will refuse to optimize the image.
-- **`accent`** is two hex colors. They draw the card gradient before the image
-  loads and the glow behind the playlist header, so pick them from the cover art.
+- **`accent`** is a single hex color, painted behind the cover while the image
+  loads. `npm run covers` samples the artwork and prints the value to paste in.
+- **`cover` is written by `npm run covers`, not by hand.** Filenames carry a
+  content hash so replacing art cannot be defeated by browser or CDN caching; the
+  script repoints this field itself.
 - Tracks by `Jody Lynn` (the exact string in `OWN_ARTIST`, see
   [`lib/site.ts`](lib/site.ts)) get a marker in the tracklist automatically.
 
