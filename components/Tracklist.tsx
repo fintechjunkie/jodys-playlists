@@ -11,7 +11,13 @@ import { OWN_ARTIST } from "@/lib/site";
  * oversized act numeral sits beside the title rather than above it, which buys
  * emphasis without buying vertical space.
  */
-export function Tracklist({ acts }: { acts: Act[] }) {
+export function Tracklist({
+  acts,
+  actNoun = "Act",
+}: {
+  acts: Act[];
+  actNoun?: string;
+}) {
   // Track number each act starts at.
   const offsets = acts.reduce<number[]>(
     (acc, act, i) => [...acc, acc[i] + act.tracks.length],
@@ -26,6 +32,10 @@ export function Tracklist({ acts }: { acts: Act[] }) {
         return (
           <section key={`${act.number}-${act.title}`} className="flex flex-col gap-4">
             <header className="border-b-2 border-lipstick-magenta pb-3">
+              {/* Just the noun — the oversized numeral below supplies the value,
+                  so "MINUTES" over "12-30" reads as a time block without saying
+                  the number twice. */}
+              <p className="label-micro mb-2 text-forest-ink/70">{actNoun}</p>
               <div className="flex items-baseline gap-4">
                 <span
                   aria-hidden
@@ -34,13 +44,15 @@ export function Tracklist({ acts }: { acts: Act[] }) {
                   {act.number}
                 </span>
                 <h3 className="display-sm text-lipstick-magenta">
-                  <span className="sr-only">Act {act.number}. </span>
+                  <span className="sr-only">{actNoun} {act.number}. </span>
                   {act.title}
                 </h3>
               </div>
-              <p className="mt-2 max-w-[60ch] text-[20px] leading-[1.2] text-forest-ink">
-                {act.note}
-              </p>
+              {act.note ? (
+                <p className="mt-2 max-w-[60ch] text-[20px] leading-[1.2] text-forest-ink">
+                  {act.note}
+                </p>
+              ) : null}
             </header>
 
             <ol className="flex flex-col">

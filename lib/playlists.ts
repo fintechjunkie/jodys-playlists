@@ -38,12 +38,20 @@ export type Track = {
 };
 
 export type Act = {
-  /** Roman numeral or number, shown as the act label. */
+  /**
+   * The act's identifier, set as the oversized display numeral. Usually a roman
+   * numeral ("III"), but any short string works — a time-based playlist uses a
+   * range like "12-30".
+   */
   number: string;
   /** Short name, e.g. "Dusk". */
   title: string;
-  /** The line that explains what this act is doing. This is the product. */
-  note: string;
+  /**
+   * The line explaining what this act is doing. This is the product, so write
+   * one wherever there is something to say — but it is optional, because some
+   * playlists have act titles that already say it.
+   */
+  note?: string;
   tracks: Track[];
 };
 
@@ -81,7 +89,13 @@ export type Playlist = {
    */
   coverBand?: "magenta" | "forest";
   acts: Act[];
-  /** Optional, e.g. "1 hr 47 min". Track count is derived from `acts`. */
+  /**
+   * What each act header is called: "Act I", or "Minutes 12-30" for a
+   * time-structured playlist. Defaults to "Act". This only labels the individual
+   * headers — "acts" stays the structural noun everywhere else.
+   */
+  actNoun?: string;
+  /** Optional, e.g. "47 min". Track count is derived from `acts`. */
   duration?: string;
   tags?: string[];
   /** Streaming links, in display order. Empty is fine — the page adapts. */
@@ -248,6 +262,200 @@ export const playlists: Playlist[] = [
           { artist: "Kelis", title: "Milkshake" },
           { artist: "Beyoncé", title: "Formation" },
           { artist: "Beyoncé", title: "Don't Hurt Yourself" },
+        ],
+      },
+    ],
+  },
+  {
+    slug: "rage-clean",
+    title: "The 47 Minute Rage Clean",
+    titleLines: ["The 47 Minute", "Rage Clean"],
+    tagline: "Forty seven minutes. Kitchen, bathroom, floors. Don't stop.",
+    description:
+      "Forty seven minutes. Kitchen, bathroom, floors. Do not stop when the first song ends. Twelve tracks sequenced so you're moving fastest at minute thirty.\n\nFree.",
+    // TODO: no artwork yet. See docs/cover-art-prompts.md, then run `npm run covers`.
+    cover: "/covers/placeholder.svg",
+    accent: "#00522d",
+    coverBand: "magenta",
+    // The runtime IS the hook, so it goes on the page.
+    duration: "47 min",
+    // Time blocks rather than numbered acts.
+    actNoun: "Minutes",
+    tags: ["rage", "cleaning", "nu metal", "workout"],
+    published: "2026-08-19",
+    // TODO: add the Spotify playlist once it exists.
+    sources: [],
+    embedProvider: "spotify",
+    acts: [
+      {
+        number: "0-12",
+        title: "Ignition",
+        note: "Dishes and clearing surfaces.",
+        tracks: [
+          { artist: "Rage Against the Machine", title: "Bulls on Parade" },
+          { artist: "Jody Lynn", title: "LOVE ME HATE ME" },
+          { artist: "The Prodigy", title: "Breathe" },
+          { artist: "Limp Bizkit", title: "Break Stuff" },
+        ],
+      },
+      {
+        number: "12-30",
+        title: "The Grind",
+        note: "Scrubbing. Peak effort.",
+        tracks: [
+          { artist: "Deftones", title: "My Own Summer (Shove It)" },
+          { artist: "Jody Lynn", title: "DARK" },
+          { artist: "Korn", title: "Blind" },
+          { artist: "System of a Down", title: "Chop Suey!" },
+          { artist: "Jody Lynn", title: "The Hunted" },
+        ],
+      },
+      {
+        number: "30-47",
+        title: "The Finish",
+        note: "Floors, trash out, done.",
+        tracks: [
+          { artist: "Linkin Park", title: "One Step Closer" },
+          { artist: "Nine Inch Nails", title: "Head Like a Hole" },
+          { artist: "Rage Against the Machine", title: "Killing in the Name" },
+        ],
+      },
+    ],
+  },
+  {
+    slug: "seventeen-again",
+    title: "Feel Seventeen Again",
+    titleLines: ["Feel", "Seventeen", "Again"],
+    tagline: "Twenty two songs that put you back in a car you no longer own.",
+    description:
+      "Twenty two songs that put you back in a car you no longer own. Play it loud enough that it's embarrassing.\n\nFree.",
+    // TODO: no artwork yet. See docs/cover-art-prompts.md, then run `npm run covers`.
+    cover: "/covers/placeholder.svg",
+    accent: "#e878b2",
+    coverBand: "forest",
+    tags: ["nostalgia", "pop punk", "emo", "throwback"],
+    published: "2026-08-19",
+    // TODO: add the Spotify playlist once it exists.
+    sources: [],
+    embedProvider: "spotify",
+    // NOTE: these acts have titles but no notes — the act names carry it for now.
+    // Notes render automatically if you add them.
+    acts: [
+      {
+        number: "I",
+        title: "The Parking Lot",
+        tracks: [
+          { artist: "Paramore", title: "Misery Business" },
+          { artist: "Fall Out Boy", title: "Sugar, We're Goin Down" },
+          { artist: "Jody Lynn", title: "Flipside" },
+          { artist: "My Chemical Romance", title: "I'm Not Okay (I Promise)" },
+          { artist: "Blink-182", title: "All the Small Things" },
+        ],
+      },
+      {
+        number: "II",
+        title: "Windows Down",
+        tracks: [
+          { artist: "Green Day", title: "American Idiot" },
+          { artist: "Jody Lynn", title: "Daily Special" },
+          { artist: "Avril Lavigne", title: "Complicated" },
+          { artist: "Jimmy Eat World", title: "The Middle" },
+          { artist: "All Time Low", title: "Dear Maria, Count Me In" },
+          { artist: "Panic! At The Disco", title: "I Write Sins Not Tragedies" },
+        ],
+      },
+      {
+        number: "III",
+        title: "Too Loud, Too Fast",
+        tracks: [
+          { artist: "Jody Lynn", title: "Different Story" },
+          { artist: "Taking Back Sunday", title: "MakeDamnSure" },
+          { artist: "Yellowcard", title: "Ocean Avenue" },
+          { artist: "The Used", title: "The Taste of Ink" },
+          { artist: "Jody Lynn", title: "Sucker" },
+          { artist: "Sum 41", title: "In Too Deep" },
+        ],
+      },
+      {
+        number: "IV",
+        title: "The Drive Home",
+        tracks: [
+          { artist: "Dashboard Confessional", title: "Hands Down" },
+          { artist: "Third Eye Blind", title: "Semi-Charmed Life" },
+          { artist: "The Killers", title: "Mr. Brightside" },
+          { artist: "Paramore", title: "The Only Exception" },
+          { artist: "My Chemical Romance", title: "Welcome to the Black Parade" },
+        ],
+      },
+    ],
+  },
+  {
+    slug: "no-contact",
+    title: "Day One Of No Contact",
+    titleLines: ["Day One Of", "No Contact"],
+    tagline: "Twenty four songs for the first week. Wreckage toward steadier.",
+    description:
+      "Twenty four songs for the first week. Sequenced from wreckage toward something steadier. It gets easier around track sixteen.\n\nFree.",
+    // TODO: no artwork yet. See docs/cover-art-prompts.md, then run `npm run covers`.
+    cover: "/covers/placeholder.svg",
+    accent: "#00522d",
+    coverBand: "magenta",
+    tags: ["heartbreak", "breakup", "healing", "sad"],
+    published: "2026-08-19",
+    // TODO: add the Spotify playlist once it exists.
+    sources: [],
+    embedProvider: "spotify",
+    acts: [
+      {
+        number: "I",
+        title: "The First 48 Hours",
+        note: "Raw.",
+        tracks: [
+          { artist: "Bon Iver", title: "Skinny Love" },
+          { artist: "Jody Lynn", title: "Hollow" },
+          { artist: "Phoebe Bridgers", title: "Motion Sickness" },
+          { artist: "Adele", title: "Someone Like You" },
+          { artist: "Jody Lynn", title: "Saving You" },
+          { artist: "Lorde", title: "Liability" },
+        ],
+      },
+      {
+        number: "II",
+        title: "The Anger Arrives",
+        note: "This is the turn, and it should feel like relief.",
+        tracks: [
+          { artist: "Olivia Rodrigo", title: "good 4 u" },
+          { artist: "Jody Lynn", title: "Bitter End" },
+          { artist: "Paramore", title: "Decode" },
+          { artist: "Kelsea Ballerini", title: "Peter Pan" },
+          { artist: "Alanis Morissette", title: "You Oughta Know" },
+          { artist: "Fiona Apple", title: "Sleep to Dream" },
+        ],
+      },
+      {
+        number: "III",
+        title: "Clarity",
+        note: "Steadier. Less about them.",
+        tracks: [
+          { artist: "Jody Lynn", title: "A Heartbeat Away" },
+          { artist: "Maggie Rogers", title: "Light On" },
+          { artist: "Lucy Dacus", title: "Night Shift" },
+          { artist: "Miley Cyrus", title: "Flowers" },
+          { artist: "Kacey Musgraves", title: "Happy & Sad" },
+          { artist: "SZA", title: "Good Days" },
+        ],
+      },
+      {
+        number: "IV",
+        title: "Day Seven",
+        note: "Not healed. Just further along.",
+        tracks: [
+          { artist: "Jody Lynn", title: "Different Story" },
+          { artist: "Florence + The Machine", title: "Shake It Out" },
+          { artist: "Robyn", title: "Dancing On My Own" },
+          { artist: "HAIM", title: "Want You Back" },
+          { artist: "Taylor Swift", title: "Clean" },
+          { artist: "Mitski", title: "Two Slow Dancers" },
         ],
       },
     ],

@@ -149,6 +149,112 @@ seen from above · a match, burnt out.
 
 ---
 
+## PROMPT 6 — The 47 Minute Rage Clean
+
+A domestic object in an aggressive posture. That tension is the whole playlist:
+household chores, hardcore soundtrack. Not a cute cleaning icon.
+
+> Flat two-color screenprint album cover, square 1:1 composition. Warm
+> off-white paper ground, hex #FFF8F6, with visible paper grain and a fine
+> halftone dot texture. A single oversized **rubber dish glove, fingers splayed
+> upward, seen straight on** rendered as a flat cut-paper silhouette in **deep
+> forest green, hex #00522D** — solid fill, no outline, no gradient, no shading,
+> no interior detail. The shape is cropped generously so it bleeds off at least
+> two edges of the frame. Lipstick magenta, hex #DB3C8A, appears only once, as a
+> small secondary shape or a thin line detail. Slight offset-print
+> misregistration, a 1–2mm color shift at one edge. Bold, graphic, editorial
+> risograph poster aesthetic. High contrast. Must read clearly at thumbnail size.
+>
+> no text, no letters, no words, no typography, no logos, no watermark, no
+> photography, no 3D render, no drop shadow, no glow, no lens flare, no
+> gradient, no bevel, no photorealism, no clutter, no busy background, no
+> border, no frame
+
+**Alternate motifs:** a scrub brush in strict profile, bristles down · a spray
+bottle with the trigger forward · a crushed aluminum can · a mop head.
+
+**Band:** magenta (the motif is green).
+
+---
+
+## PROMPT 7 — Feel Seventeen Again
+
+"A car you no longer own" dates this precisely. The motif should be an object
+that stopped existing, so it carries the year without saying it.
+
+> Flat two-color screenprint album cover, square 1:1 composition. Warm
+> off-white paper ground, hex #FFF8F6, with visible paper grain and a fine
+> halftone dot texture. A single oversized **burned CD-R disc seen face-on, a
+> perfect circle with the clear center hole** rendered as a flat cut-paper
+> silhouette in **cotton pink, hex #E878B2** — solid fill, no outline, no
+> gradient, no shading, no interior detail. The shape is cropped generously so
+> it bleeds off at least two edges of the frame. Deep forest green, hex #00522D,
+> appears only once, as a small secondary shape or a thin line detail. Slight
+> offset-print misregistration, a 1–2mm color shift at one edge. Bold, graphic,
+> editorial risograph poster aesthetic. High contrast. Must read clearly at
+> thumbnail size.
+>
+> no text, no letters, no words, no typography, no logos, no watermark, no
+> photography, no 3D render, no drop shadow, no glow, no lens flare, no
+> gradient, no bevel, no photorealism, no clutter, no busy background, no
+> border, no frame
+
+**Alternate motifs:** a car key on a single keyring · a stack of festival
+wristbands · a folded paper note · a lanyard hanging straight down.
+
+**Band:** forest (the motif is pink).
+
+---
+
+## PROMPT 8 — Day One Of No Contact
+
+The best motif here is the literal act the title describes. A face-down phone IS
+no contact — it needs no metaphor, and it avoids the cracked-heart cliché
+entirely. Forest green rather than pink: the cover has to open in the wreckage,
+even though the sequence ends somewhere steadier.
+
+> Flat two-color screenprint album cover, square 1:1 composition. Warm
+> off-white paper ground, hex #FFF8F6, with visible paper grain and a fine
+> halftone dot texture. A single oversized **smartphone lying face-down, seen
+> from directly above at a slight angle** rendered as a flat cut-paper
+> silhouette in **deep forest green, hex #00522D** — solid fill, no outline, no
+> gradient, no shading, no interior detail. The shape is cropped generously so
+> it bleeds off at least two edges of the frame. Lipstick magenta, hex #DB3C8A,
+> appears only once, as a small secondary shape or a thin line detail. Slight
+> offset-print misregistration, a 1–2mm color shift at one edge. Bold, graphic,
+> editorial risograph poster aesthetic. High contrast. Must read clearly at
+> thumbnail size.
+>
+> no text, no letters, no words, no typography, no logos, no watermark, no
+> photography, no 3D render, no drop shadow, no glow, no lens flare, no
+> gradient, no bevel, no photorealism, no clutter, no busy background, no
+> border, no frame
+
+**Alternate motifs:** a closed door seen straight on · a single unmatched
+earring · a calendar page torn at one corner · a burnt match.
+
+**Band:** magenta (the motif is green).
+
+---
+
+## Accent order across the index
+
+Rule 6 below says vary the accent between neighbors. With all five playlists the
+index currently alternates cleanly, which is why "Day One Of No Contact" is green
+rather than the softer pink you might expect:
+
+| # | Playlist | Motif color |
+|---|---|---|
+| 1 | Halloween Party, Actually Scary | forest green |
+| 2 | Revenge Dressing | lipstick magenta |
+| 3 | The 47 Minute Rage Clean | forest green |
+| 4 | Feel Seventeen Again | cotton pink |
+| 5 | Day One Of No Contact | forest green |
+
+No two neighbors share a color. If you reorder the playlists, re-check this.
+
+---
+
 ## Rules for inventing new covers
 
 1. **One object. Always one.** Two objects and the thumbnail turns to mud.

@@ -118,7 +118,7 @@ export default async function PlaylistPage({ params }: Params) {
             as="h2"
             className="display-md mb-12"
           />
-          <Tracklist acts={playlist.acts} />
+          <Tracklist acts={playlist.acts} actNoun={playlist.actNoun} />
         </section>
 
         <Link
