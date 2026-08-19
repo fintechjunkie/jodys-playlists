@@ -107,11 +107,14 @@ export const playlists: Playlist[] = [
     coverBand: "magenta",
     tags: ["halloween", "goth", "industrial", "party"],
     published: "2026-08-19",
-    // TODO: add the real share links + Spotify playlist ID. While `sources` is
-    // empty the page shows a "links coming soon" note instead of dead buttons.
-    // Once you have it:
-    //   { provider: "spotify", url: "https://open.spotify.com/playlist/<id>", embedId: "<id>" }
-    sources: [],
+    sources: [
+      {
+        provider: "spotify",
+        // ?si= share-tracking parameter stripped, as above.
+        url: "https://open.spotify.com/playlist/0GjwEVyE4BykephX88JqIV",
+        embedId: "0GjwEVyE4BykephX88JqIV",
+      },
+    ],
     embedProvider: "spotify",
     acts: [
       {
@@ -182,8 +185,15 @@ export const playlists: Playlist[] = [
     coverBand: "forest",
     tags: ["pop", "hype", "getting ready", "confidence"],
     published: "2026-08-19",
-    // TODO: add the real share links + Spotify playlist ID (see note above).
-    sources: [],
+    sources: [
+      {
+        provider: "spotify",
+        // The ?si= share-tracking parameter is stripped: it identifies whoever
+        // copied the link, and there's no reason to attach it to every visitor.
+        url: "https://open.spotify.com/playlist/7neCWZPod8zQ2U5KVbhoYw",
+        embedId: "7neCWZPod8zQ2U5KVbhoYw",
+      },
+    ],
     embedProvider: "spotify",
     acts: [
       {
