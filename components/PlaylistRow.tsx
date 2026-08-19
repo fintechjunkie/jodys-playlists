@@ -43,10 +43,18 @@ export function PlaylistRow({
             {String(index + 1).padStart(2, "0")} — {count} tracks · {playlist.acts.length} acts
           </p>
 
+          {/*
+            The cover art now carries the title, burned in. On a phone the cover
+            is full width and the title would repeat immediately beneath it,
+            which reads as a stutter. Below sm the heading goes screen-reader-only
+            — still a real h2 for document structure and SEO, just not printed
+            twice. From sm up the cover is a 220px thumbnail beside the type, so
+            the title has to be visible there.
+          */}
           <AnimatedTitle
             lines={titleLines(playlist)}
             as="h2"
-            className="display-md"
+            className="display-md max-sm:sr-only"
             hoverColors={HOVER_COLORS}
             delay={index * 90}
           />
