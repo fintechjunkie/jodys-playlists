@@ -2,6 +2,30 @@ import type { Act } from "@/lib/playlists";
 import { OWN_ARTIST } from "@/lib/site";
 
 /**
+ * Alternating act-header blocks. Each entry carries its background AND the type
+ * colours that read on it — the pairing is the point, so they travel together
+ * rather than being applied independently and hoping they contrast.
+ *
+ * Chartreuse block: dark type. Charcoal block: chartreuse type. The inversion
+ * between consecutive acts is what makes the alternation feel deliberate instead
+ * of like two unrelated colour choices.
+ */
+const ACT_BLOCKS = [
+  {
+    bg: "bg-chartreuse",
+    label: "text-forest-ink",
+    title: "text-charcoal",
+    note: "text-charcoal",
+  },
+  {
+    bg: "bg-charcoal",
+    label: "text-bubblegum",
+    title: "text-chartreuse",
+    note: "text-warm-chalk",
+  },
+];
+
+/**
  * The acts, in order, with continuous track numbering across act boundaries —
  * so track 14 is the 14th song you hear, not the 2nd song of act III.
  *
@@ -28,10 +52,26 @@ export function Tracklist({
     <div className="flex flex-col gap-16">
       {acts.map((act, actIndex) => {
         const start = offsets[actIndex];
+        // Alternate the block, and invert the type with it: the chartreuse block
+        // carries dark type, the charcoal block carries chartreuse type. Reusing
+        // one type colour on both would fail contrast on one of them.
+        const block = ACT_BLOCKS[actIndex % ACT_BLOCKS.length];
 
         return (
           <section key={`${act.number}-${act.title}`} className="flex flex-col gap-4">
-            <header className="border-b-2 border-lipstick-magenta pb-4">
+            <header className="relative isolate py-8 sm:py-10">
+              {/*
+                Full-bleed color block. The tracklist sits in a centred
+                max-width container, so the block breaks out of it: pinned to the
+                container's horizontal centre, then pulled back half a viewport
+                and made a full viewport wide. Body has overflow-x clipped to
+                absorb the scrollbar that 100vw includes.
+              */}
+              <div
+                aria-hidden
+                className={`absolute inset-y-0 left-1/2 -z-10 -ml-[50vw] w-[100vw] ${block.bg}`}
+              />
+
               {/*
                 "ACT III" is set as one display unit, at display scale. A bare
                 oversized numeral doesn't tell anyone it's an act, and the word
@@ -39,12 +79,12 @@ export function Tracklist({
                 value stay together and stay large. Works identically for
                 "MINUTES 30-47" on the time-structured playlist.
               */}
-              <p className="display-sm mb-2 text-bubblegum">
+              <p className={`display-sm mb-2 ${block.label}`}>
                 {actNoun} {act.number}
               </p>
-              <h3 className="display-md text-lipstick-magenta">{act.title}</h3>
+              <h3 className={`display-md ${block.title}`}>{act.title}</h3>
               {act.note ? (
-                <p className="mt-4 max-w-[60ch] text-[20px] leading-[1.2] text-forest-ink">
+                <p className={`mt-4 max-w-[60ch] text-[20px] leading-[1.2] ${block.note}`}>
                   {act.note}
                 </p>
               ) : null}

@@ -25,6 +25,16 @@
   --color-cotton-pink: #e878b2;
 
   /*
+   * Chartreuse and charcoal are additions to the reference palette, requested
+   * for the alternating act blocks. They are the only two colors on the site
+   * outside the original system, and they appear ONLY as act-header block
+   * backgrounds — never as type on the cream canvas, which would break the
+   * editorial voice the reference sets up.
+   */
+  --color-chartreuse: #d9f24b;
+  --color-charcoal: #2e2f33;
+
+  /*
    * Beni and Clash Grotesk aren't free/self-hostable, so these are the
    * substitutes the reference names: Anton stands in for Beni (ultra-black
    * condensed display, weight baked in), Inter for Clash Grotesk.
@@ -50,6 +60,13 @@ body {
   color: var(--color-forest-ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  /*
+   * The act-header blocks break out of the centred container to full viewport
+   * width using 100vw, which counts the scrollbar and would otherwise add a few
+   * pixels of horizontal scroll. Nothing on the page is meant to scroll
+   * sideways, so clip it here.
+   */
+  overflow-x: hidden;
 }
 
 ::selection {
