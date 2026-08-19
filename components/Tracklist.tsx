@@ -31,25 +31,20 @@ export function Tracklist({
 
         return (
           <section key={`${act.number}-${act.title}`} className="flex flex-col gap-4">
-            <header className="border-b-2 border-lipstick-magenta pb-3">
-              {/* Just the noun — the oversized numeral below supplies the value,
-                  so "MINUTES" over "12-30" reads as a time block without saying
-                  the number twice. */}
-              <p className="label-micro mb-2 text-forest-ink/70">{actNoun}</p>
-              <div className="flex items-baseline gap-4">
-                <span
-                  aria-hidden
-                  className="display-md shrink-0 text-bubblegum"
-                >
-                  {act.number}
-                </span>
-                <h3 className="display-sm text-lipstick-magenta">
-                  <span className="sr-only">{actNoun} {act.number}. </span>
-                  {act.title}
-                </h3>
-              </div>
+            <header className="border-b-2 border-lipstick-magenta pb-4">
+              {/*
+                "ACT III" is set as one display unit, at display scale. A bare
+                oversized numeral doesn't tell anyone it's an act, and the word
+                shrunk to 12px was too small to do that job — so the noun and its
+                value stay together and stay large. Works identically for
+                "MINUTES 30-47" on the time-structured playlist.
+              */}
+              <p className="display-sm mb-2 text-bubblegum">
+                {actNoun} {act.number}
+              </p>
+              <h3 className="display-md text-lipstick-magenta">{act.title}</h3>
               {act.note ? (
-                <p className="mt-2 max-w-[60ch] text-[20px] leading-[1.2] text-forest-ink">
+                <p className="mt-4 max-w-[60ch] text-[20px] leading-[1.2] text-forest-ink">
                   {act.note}
                 </p>
               ) : null}
