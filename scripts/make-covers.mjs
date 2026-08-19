@@ -20,7 +20,8 @@
  */
 
 import { createCanvas, GlobalFonts, loadImage } from "@napi-rs/canvas";
-import { readdir, mkdir, writeFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { readdir, mkdir, readFile, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -44,6 +45,57 @@ const SITE_SIZE = 1600;
 const ACCEPTED = new Set([".png", ".jpg", ".jpeg", ".webp"]);
 
 GlobalFonts.registerFromPath(path.join(FONTS, "Anton-Regular.ttf"), "AntonCover");
+
+/**
+ * Site covers are written as <slug>-<hash>.jpg, where the hash is of the image
+ * bytes themselves.
+ *
+ * Without this, replacing a cover leaves the URL unchanged, so browsers and CDNs
+ * keep serving the old picture indefinitely — the file on disk is new and the
+ * page still shows the previous art. A content hash means new art is always a new
+ * URL, which nothing can have cached. The Spotify export keeps a stable name; it
+ * is downloaded by hand, never fetched by a browser.
+ */
+function contentName(slug, buffer) {
+  const hash = createHash("sha256").update(buffer).digest("hex").slice(0, 8);
+  return `${slug}-${hash}.jpg`;
+}
+
+/** Remove earlier hashed versions of this slug so old files do not pile up. */
+async function pruneOldVersions(slug, keep) {
+  const files = await readdir(SITE_OUT);
+  const stale = files.filter(
+    (f) => f !== keep && new RegExp(`^${slug}-[0-9a-f]{8}\\.jpg$`).test(f),
+  );
+  for (const f of stale) await unlink(path.join(SITE_OUT, f));
+  return stale;
+}
+
+/**
+ * Point the playlist entry at its new cover file.
+ *
+ * Done automatically because the filename now contains a content hash — not
+ * something anyone should be copying by hand on every regeneration.
+ */
+async function updateCoverPath(slug, filename) {
+  const dataFile = path.join(ROOT, "lib", "playlists.ts");
+  const source = await readFile(dataFile, "utf8");
+
+  // Find this playlist's entry, then the first cover: line inside it.
+  const slugAt = source.indexOf(`slug: "${slug}"`);
+  if (slugAt === -1) return false;
+  const coverAt = source.indexOf('cover: "', slugAt);
+  if (coverAt === -1) return false;
+  const end = source.indexOf('",', coverAt);
+  if (end === -1) return false;
+
+  const current = source.slice(coverAt, end + 2);
+  const replacement = `cover: "/covers/${filename}",`;
+  if (current === replacement) return false;
+
+  await writeFile(dataFile, source.slice(0, coverAt) + replacement + source.slice(end + 2));
+  return true;
+}
 
 /** Output size for a target, never exceeding what the source actually has. */
 function outputSize(target, image) {
@@ -298,7 +350,11 @@ async function main() {
     const site = await render(image, playlist, outputSize(SITE_SIZE, image));
 
     await writeFile(path.join(SPOTIFY_OUT, `${slug}-cover.jpg`), spotify.buffer);
-    await writeFile(path.join(SITE_OUT, `${slug}.jpg`), site.buffer);
+
+    const siteName = contentName(slug, site.buffer);
+    await writeFile(path.join(SITE_OUT, siteName), site.buffer);
+    const pruned = await pruneOldVersions(slug, siteName);
+    const repointed = await updateCoverPath(slug, siteName);
 
     const suggested = dominantColor(image);
     made += 1;
@@ -308,14 +364,13 @@ async function main() {
     console.log(
       `  title       ${spotify.lines.join(" / ")}  @ ${spotify.fontSize}px, ${playlist.coverInk ?? "forest"} ink`,
     );
-    console.log(`  site        public/covers/${slug}.jpg  ${site.size}px`);
+    console.log(`  site        public/covers/${siteName}  ${site.size}px`);
     console.log(`  spotify     art/spotify/${slug}-cover.jpg  ${spotify.size}px`);
     if (suggested && suggested !== playlist.accent) {
       console.log(`  accent      ${playlist.accent} -> suggest "${suggested}"`);
     }
-    if (playlist.cover !== `/covers/${slug}.jpg`) {
-      console.log(`  ACTION      set cover: "/covers/${slug}.jpg" (currently "${playlist.cover}")`);
-    }
+    if (repointed) console.log(`  repointed   lib/playlists.ts -> /covers/${siteName}`);
+    if (pruned.length) console.log(`  pruned      ${pruned.join(", ")}`);
   }
 
   console.log(`\nDone — ${made} cover${made === 1 ? "" : "s"}.`);

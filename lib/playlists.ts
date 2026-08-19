@@ -116,7 +116,7 @@ export const playlists: Playlist[] = [
     tagline: "No Monster Mash. No Thriller. Twenty six songs that feel like the night.",
     description:
       "No Monster Mash. No Thriller. Twenty six songs that actually feel like the night.\n\nSequenced from dusk to after midnight, so just press play and let it run the room.",
-    cover: "/covers/actually-scary.jpg",
+    cover: "/covers/actually-scary-1028ab18.jpg",
     accent: "#05462b",
     coverInk: "magenta",
     tags: ["halloween", "goth", "industrial", "party"],
@@ -194,7 +194,7 @@ export const playlists: Playlist[] = [
     tagline: "For the night you're getting ready and you already know.",
     description:
       "For the night you're getting ready and you already know. Twenty six songs sequenced from first coat of mascara to walking out the door.\n\nConfidence, not closure.",
-    cover: "/covers/revenge-dressing.jpg",
+    cover: "/covers/revenge-dressing-1d3597ca.jpg",
     accent: "#f12c72",
     coverInk: "forest",
     tags: ["pop", "hype", "getting ready", "confidence"],
@@ -273,7 +273,7 @@ export const playlists: Playlist[] = [
     tagline: "Forty seven minutes. Kitchen, bathroom, floors. Don't stop.",
     description:
       "Forty seven minutes. Kitchen, bathroom, floors. Do not stop when the first song ends. Twelve tracks sequenced so you're moving fastest at minute thirty.\n\nFree.",
-    cover: "/covers/rage-clean.jpg",
+    cover: "/covers/rage-clean-cb07ceab.jpg",
     accent: "#024b2b",
     coverInk: "magenta",
     // The runtime IS the hook, so it goes on the page.
@@ -328,7 +328,7 @@ export const playlists: Playlist[] = [
     tagline: "Twenty two songs that put you back in a car you no longer own.",
     description:
       "Twenty two songs that put you back in a car you no longer own. Play it loud enough that it's embarrassing.\n\nFree.",
-    cover: "/covers/seventeen-again.jpg",
+    cover: "/covers/seventeen-again-167840d1.jpg",
     accent: "#ec6697",
     coverInk: "forest",
     tags: ["nostalgia", "pop punk", "emo", "throwback"],
@@ -394,7 +394,7 @@ export const playlists: Playlist[] = [
     tagline: "Twenty four songs for the first week. Wreckage toward steadier.",
     description:
       "Twenty four songs for the first week. Sequenced from wreckage toward something steadier. It gets easier around track sixteen.\n\nFree.",
-    cover: "/covers/no-contact.jpg",
+    cover: "/covers/no-contact-173d4ca0.jpg",
     accent: "#034629",
     coverInk: "magenta",
     tags: ["heartbreak", "breakup", "healing", "sad"],
