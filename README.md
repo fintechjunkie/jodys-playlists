@@ -3,6 +3,53 @@
 Next.js 16 + Tailwind 4, deployed on Vercel. Every playlist is prerendered as
 static HTML at build time, so the site is fast and costs nothing to serve.
 
+## Design system
+
+The visual language is the Agence Foudre editorial reference, vendored at
+[`docs/DESIGN.md`](docs/DESIGN.md). **Read it before changing any styling.** The
+tokens live in the `@theme` block of [`app/globals.css`](app/globals.css).
+
+Rules that are easy to violate by reflex:
+
+- **No shadows, no gradients, no glass.** The system is flat on purpose; depth
+  comes from type scale and color contrast.
+- **No card grids.** The index is full-width editorial rows. Structure comes
+  from whitespace (60–120px section gaps) and typographic scale.
+- **Body text is `forest-ink` (#00522d), never black.** Black is for icons and
+  line art only. Magenta is punctuation — never a background for large areas.
+- **Body copy caps at 60ch** regardless of viewport.
+- **Left-align everything.** No symmetric centered layouts.
+- **Two type families only.** `display-*` classes (Anton) for display, Inter for
+  everything functional. Never set display type below 30px.
+
+Two deliberate deviations from the reference, both documented in the CSS:
+
+1. Beni and Clash Grotesk aren't freely licensed, so we use **Anton** and
+   **Inter** — both named on the reference's own substitute list, self-hosted
+   through `next/font`.
+2. Display sizes use `clamp()` rather than the reference's fixed
+   46/80/94/130/230px. The ranges hit those values at desktop widths and
+   collapse proportionally below, which is the responsive behavior it asks for.
+
+### Motion
+
+Titles are the only animated thing on the site, and that's the point — the
+stillness everywhere else is what makes them read as deliberate.
+
+- [`AnimatedTitle`](components/AnimatedTitle.tsx) staggers each character into
+  place. The stagger is an inline `--i` custom property feeding a CSS
+  `animation-delay`, so it stays a **server component** and animates before any
+  JS arrives. Characters are `aria-hidden` behind an `aria-label` so screen
+  readers get whole words, not spelling.
+- [`TitleMarquee`](components/TitleMarquee.tsx) drifts a faded echo of the title
+  sideways behind the hero. The track is duplicated and translated exactly -50%,
+  so the loop is seamless with no JS measuring anything.
+- Index rows sweep their title into magenta letter by letter on hover
+  (`.title-sweep`). Hover recolor is a `transition`, not an `animation`, so it
+  never fights the entrance keyframes.
+
+Everything above is disabled under `prefers-reduced-motion`. Keep it that way.
+
 ## Run it locally
 
 ```bash
