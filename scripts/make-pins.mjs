@@ -24,6 +24,10 @@ import { BOARD_BANNER, PIN_COPY, pins } from "../lib/pins.ts";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const INBOX = path.join(ROOT, "art", "pins", "inbox");
 const OUT = path.join(ROOT, "art", "pins", "out");
+const VARIANTS = path.join(ROOT, "art", "pins", "variants");
+
+/** Treatments rendered by `npm run pins -- --variants` for side-by-side review. */
+const TREATMENTS = ["band", "tag", "rule", "bare"];
 const FONTS = path.join(ROOT, "art", "fonts");
 
 // Palette — must match app/globals.css.
@@ -141,7 +145,49 @@ function zoneBands(zone) {
   ];
 }
 
-async function renderPin(image, pin) {
+/**
+ * Mean relative luminance of a region of the already-drawn canvas, 0..1.
+ *
+ * Used by the blockless treatments to pick type colour from what is actually
+ * behind the text, instead of laying a scrim over the photograph to force one.
+ */
+function zoneLuminance(ctx, x, y, w, h) {
+  const { data } = ctx.getImageData(
+    Math.max(0, Math.round(x)),
+    Math.max(0, Math.round(y)),
+    Math.max(1, Math.round(w)),
+    Math.max(1, Math.round(h)),
+  );
+  let sum = 0;
+  const n = data.length / 4;
+  for (let i = 0; i < data.length; i += 4) {
+    sum += (0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2]) / 255;
+  }
+  return sum / n;
+}
+
+/** Type colours for blockless treatments, chosen against the measured backdrop. */
+function adaptiveTheme(luminance) {
+  return luminance > 0.55
+    ? { headline: C.charcoal, subline: C.forest, brand: C.magenta, rule: C.magenta }
+    : { headline: C.chalk, subline: C.chalk, brand: C.chartreuse, rule: C.chartreuse };
+}
+
+/**
+ * Composite one pin.
+ *
+ * `treatment` controls how hard the type sits on the photograph:
+ *
+ *   "band" — solid block across the full width. Loudest and most ad-like, which
+ *            suits high-intent boards where looking like an offer is the point.
+ *   "tag"  — solid block only as wide as the text needs. Reads as a label stuck
+ *            on the image rather than a bar imposed across it.
+ *   "bare" — no block at all. Type sits directly on the photograph, coloured from
+ *            the measured luminance of what is behind it.
+ *   "rule" — "bare" plus a short brand-colour rule above the headline, which buys
+ *            some structure back without covering anything.
+ */
+async function renderPin(image, pin, treatment = "band") {
   // Preserve aspect; never upscale.
   const scale = Math.min(1, MAX_EDGE / Math.max(image.width, image.height));
   const W = Math.round(image.width * scale);
@@ -151,33 +197,65 @@ async function renderPin(image, pin) {
   const ctx = canvas.getContext("2d");
   ctx.drawImage(image, 0, 0, W, H);
 
-  const theme = BANNERS[pin.banner ?? BOARD_BANNER[pin.copy.board]];
+  const banner = BANNERS[pin.banner ?? BOARD_BANNER[pin.copy.board]];
   const margin = Math.round(W * 0.07);
   const inner = W - margin * 2;
   const bands = zoneBands(pin.zone);
   const brandSize = Math.max(12, Math.round(W * 0.022));
+  const hasBlock = treatment === "band" || treatment === "tag";
 
   for (const band of bands) {
     const top = Math.round(H * band.from);
     const height = Math.round(H * (band.to - band.from));
-
-    ctx.fillStyle = theme.bg;
-    ctx.fillRect(0, top, W, height);
-
     const padY = Math.round(height * 0.14);
     const boxTop = top + padY;
     const boxHeight = height - padY * 2;
 
+    // Blockless treatments read their colours off the photograph itself.
+    const theme = hasBlock
+      ? banner
+      : adaptiveTheme(zoneLuminance(ctx, 0, top, W, height));
+
+    const ruleBlock = treatment === "rule" ? Math.round(brandSize * 1.4) : 0;
+
     if (band.role === "headline") {
-      // Reserve room for the brand line, and for the subline when both share
-      // this single banner (top/middle zones).
       const sharesBanner = pin.zone !== "split" && Boolean(pin.copy.subline);
       const brandBlock = brandSize * 2.2;
       const sublineBlock = sharesBanner ? boxHeight * 0.26 : 0;
-      const headlineBox = boxHeight - brandBlock - sublineBlock;
+      const headlineBox = boxHeight - brandBlock - sublineBlock - ruleBlock;
 
       const head = fitText(ctx, pin.copy.headline.toUpperCase(), "AntonPin", inner, headlineBox, 3);
-      let y = boxTop + brandBlock;
+      const sub = sharesBanner
+        ? fitText(ctx, pin.copy.subline, "InterPin", inner, sublineBlock, 2)
+        : null;
+
+      // Text is measured before any block is drawn, so a "tag" block can be
+      // sized to the text rather than the frame.
+      if (treatment === "band") {
+        ctx.fillStyle = theme.bg;
+        ctx.fillRect(0, top, W, height);
+      } else if (treatment === "tag") {
+        const widest = Math.max(
+          ...head.lines.map((l) => {
+            ctx.font = `${head.fontSize}px AntonPin`;
+            return ctx.measureText(l).width;
+          }),
+          ...(sub
+            ? sub.lines.map((l) => {
+                ctx.font = `${sub.fontSize}px InterPin`;
+                return ctx.measureText(l).width;
+              })
+            : [0]),
+        );
+        const pad = Math.round(W * 0.035);
+        const blockW = Math.min(W, widest + margin + pad);
+        const blockTop = boxTop - pad;
+        const blockH =
+          brandBlock + ruleBlock + head.lines.length * head.lineHeight +
+          (sub ? brandSize * 0.6 + sub.lines.length * sub.lineHeight : 0) + pad * 2;
+        ctx.fillStyle = theme.bg;
+        ctx.fillRect(0, blockTop, blockW, blockH);
+      }
 
       ctx.fillStyle = theme.brand;
       ctx.font = `${brandSize}px InterPin`;
@@ -187,25 +265,39 @@ async function renderPin(image, pin) {
       ctx.fillText("JODY'S PLAYLISTS", margin, boxTop + brandSize);
       ctx.letterSpacing = "0px";
 
-      y = drawLines(ctx, head, "AntonPin", theme.headline, margin, y);
+      let y = boxTop + brandBlock;
 
-      if (sharesBanner) {
-        const sub = fitText(ctx, pin.copy.subline, "InterPin", inner, sublineBlock, 2);
-        drawLines(ctx, sub, "InterPin", theme.subline, margin, y + brandSize * 0.6);
+      if (treatment === "rule") {
+        ctx.fillStyle = theme.rule;
+        ctx.fillRect(margin, y, Math.round(W * 0.16), Math.max(3, Math.round(W * 0.008)));
+        y += ruleBlock;
       }
+
+      y = drawLines(ctx, head, "AntonPin", theme.headline, margin, y);
+      if (sub) drawLines(ctx, sub, "InterPin", theme.subline, margin, y + brandSize * 0.6);
     } else {
-      // Bottom banner of a split: subline only, set larger since it stands alone.
+      // Bottom band of a split: subline only, set larger since it stands alone.
       const sub = fitText(ctx, pin.copy.subline ?? "", "InterPin", inner, boxHeight, 3);
       if (sub) {
         const blockH = sub.lines.length * sub.lineHeight;
-        drawLines(
-          ctx,
-          sub,
-          "InterPin",
-          theme.subline,
-          margin,
-          boxTop + Math.max(0, (boxHeight - blockH) / 2),
-        );
+        const textTop = boxTop + Math.max(0, (boxHeight - blockH) / 2);
+
+        if (treatment === "band") {
+          ctx.fillStyle = theme.bg;
+          ctx.fillRect(0, top, W, height);
+        } else if (treatment === "tag") {
+          const widest = Math.max(
+            ...sub.lines.map((l) => {
+              ctx.font = `${sub.fontSize}px InterPin`;
+              return ctx.measureText(l).width;
+            }),
+          );
+          const pad = Math.round(W * 0.035);
+          ctx.fillStyle = theme.bg;
+          ctx.fillRect(0, textTop - pad, Math.min(W, widest + margin + pad), blockH + pad * 2);
+        }
+
+        drawLines(ctx, sub, "InterPin", theme.subline, margin, textTop);
       }
     }
   }
@@ -213,7 +305,48 @@ async function renderPin(image, pin) {
   return { buffer: await canvas.encode("jpeg", 92), W, H };
 }
 
+/**
+ * Render every treatment for a handful of representative pins, so the choice can
+ * be made by looking rather than by argument. One dark photograph, one bright
+ * one, and one mid-tone, since the blockless treatments behave differently on
+ * each.
+ */
+async function renderVariants() {
+  const SAMPLES = ["pin-01", "pin-12", "pin-03"];
+  const byFile = new Map(pins.map((p) => [p.file, p]));
+
+  for (const treatment of TREATMENTS) {
+    await mkdir(path.join(VARIANTS, treatment), { recursive: true });
+  }
+
+  for (const file of SAMPLES) {
+    const pin = byFile.get(file);
+    if (!pin) {
+      console.warn(`SKIP ${file} — not assigned in lib/pins.ts`);
+      continue;
+    }
+    const copy = PIN_COPY[pin.copyId];
+    const image = await loadImage(path.join(INBOX, `${file}.png`));
+
+    for (const treatment of TREATMENTS) {
+      const out = await renderPin(image, { ...pin, copy }, treatment);
+      await writeFile(
+        path.join(VARIANTS, treatment, `${file}--${pin.copyId}.jpg`),
+        out.buffer,
+      );
+    }
+    console.log(`${file}  ${copy.headline}  ->  ${TREATMENTS.join(", ")}`);
+  }
+
+  console.log(`\nVariants in art/pins/variants/<treatment>/`);
+}
+
 async function main() {
+  if (process.argv.includes("--variants")) {
+    await renderVariants();
+    return;
+  }
+
   await mkdir(INBOX, { recursive: true });
   await mkdir(OUT, { recursive: true });
 
@@ -248,7 +381,7 @@ async function main() {
     }
 
     const image = await loadImage(path.join(INBOX, file));
-    const out = await renderPin(image, { ...pin, copy });
+    const out = await renderPin(image, { ...pin, copy }, pin.treatment ?? "band");
 
     // Grouped by board and named after the copy, so a board's folder can be
     // bulk-uploaded or scheduled as one batch and every file says what it is.

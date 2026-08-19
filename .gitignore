@@ -48,3 +48,6 @@ next-env.d.ts
 
 # Generated pins — rebuild with `npm run pins` from art/pins/inbox/
 /art/pins/out/
+
+# Treatment mockups — rebuild with `npm run pins -- --variants`
+/art/pins/variants/

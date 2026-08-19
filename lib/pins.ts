@@ -35,6 +35,23 @@ export type PinZone = "top" | "middle" | "split";
  */
 export type PinBanner = "charcoal" | "magenta" | "cream";
 
+/**
+ * How hard the type sits on the photograph.
+ *
+ *   "band" — solid block across the full width. Loudest, most ad-like. Suits
+ *            high-intent boards, and any image whose quiet zone is bright and
+ *            busy enough that blockless type would lose legibility.
+ *   "tag"  — solid block only as wide as the text. Barely differs from "band"
+ *            once a headline runs long, so rarely worth choosing.
+ *   "bare" — no block. Type sits on the photograph, coloured from the measured
+ *            luminance behind it. Best on dark, controlled images.
+ *   "rule" — "bare" plus a short brand-colour rule above the headline. Keeps
+ *            some brand structure without covering the picture.
+ *
+ * Preview all four with:  npm run pins -- --variants
+ */
+export type PinTreatment = "band" | "tag" | "bare" | "rule";
+
 export type PinCopy = {
   board: PinBoard;
   /** The big line. Set very large, so shorter is stronger. */
@@ -179,6 +196,8 @@ export type Pin = {
   zone: PinZone;
   /** Defaults to the board's colourway in BOARD_BANNER. */
   banner?: PinBanner;
+  /** Defaults to "band". */
+  treatment?: PinTreatment;
 };
 
 /**
