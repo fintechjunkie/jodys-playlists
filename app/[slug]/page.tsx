@@ -69,7 +69,7 @@ export default async function PlaylistPage({ params }: Params) {
 
       {/* The title again as a drifting echo band — the dynamic counterpoint to
           the statement above. */}
-      <TitleMarquee text={`${playlist.title} —`} className="text-blush-cream" />
+      <TitleMarquee text={`${playlist.title} —`} className="text-bubblegum" />
 
       <div className="mx-auto max-w-[1440px] px-6 sm:px-15">
         {/* The pitch. This is what someone reads before deciding to press play. */}

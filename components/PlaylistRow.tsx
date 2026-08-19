@@ -30,11 +30,11 @@ export function PlaylistRow({
     >
       <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:gap-10">
         {/* Asymmetric: image left, type right, never centered. */}
-        <div className="w-full max-w-[220px] shrink-0">
+        <div className="w-full shrink-0 sm:max-w-[220px]">
           <Cover
             playlist={playlist}
             priority={priority}
-            sizes="(max-width: 640px) 90vw, 220px"
+            sizes="(max-width: 640px) 100vw, 220px"
           />
         </div>
 
