@@ -282,8 +282,14 @@ export const playlists: Playlist[] = [
     actNoun: "Minutes",
     tags: ["rage", "cleaning", "nu metal", "workout"],
     published: "2026-08-19",
-    // TODO: add the Spotify playlist once it exists.
-    sources: [],
+    sources: [
+      {
+        provider: "spotify",
+        // ?si= stripped: it identifies whoever copied the link.
+        url: "https://open.spotify.com/playlist/1ESLnpfxMtgJYNLQZQMczo",
+        embedId: "1ESLnpfxMtgJYNLQZQMczo",
+      },
+    ],
     embedProvider: "spotify",
     acts: [
       {
@@ -333,8 +339,14 @@ export const playlists: Playlist[] = [
     coverInk: "forest",
     tags: ["nostalgia", "pop punk", "emo", "throwback"],
     published: "2026-08-19",
-    // TODO: add the Spotify playlist once it exists.
-    sources: [],
+    sources: [
+      {
+        provider: "spotify",
+        // ?si= stripped: it identifies whoever copied the link.
+        url: "https://open.spotify.com/playlist/2kjHCNwPyYXRtuVEvGdfma",
+        embedId: "2kjHCNwPyYXRtuVEvGdfma",
+      },
+    ],
     embedProvider: "spotify",
     // NOTE: these acts have titles but no notes — the act names carry it for now.
     // Notes render automatically if you add them.
@@ -399,8 +411,14 @@ export const playlists: Playlist[] = [
     coverInk: "magenta",
     tags: ["heartbreak", "breakup", "healing", "sad"],
     published: "2026-08-19",
-    // TODO: add the Spotify playlist once it exists.
-    sources: [],
+    sources: [
+      {
+        provider: "spotify",
+        // ?si= stripped: it identifies whoever copied the link.
+        url: "https://open.spotify.com/playlist/4PD1W8HIC1CXaHcUmPXr0w",
+        embedId: "4PD1W8HIC1CXaHcUmPXr0w",
+      },
+    ],
     embedProvider: "spotify",
     acts: [
       {
