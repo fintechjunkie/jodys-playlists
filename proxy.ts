@@ -4,7 +4,7 @@ import { livePlaylists } from "@/lib/playlists";
 /**
  * Vanity subdomains for ad campaigns.
  *
- *   late-night-drive.jodysplaylists.com  ->  serves /late-night-drive
+ *   late-night-drive.violetelixir.com  ->  serves /late-night-drive
  *
  * One wildcard DNS record + one wildcard domain in Vercel covers every playlist,
  * so adding a playlist still means editing one file and committing. The path

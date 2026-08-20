@@ -3,8 +3,8 @@
  * To add a playlist: append an object to `playlists` and commit. Vercel deploys it.
  *
  * `slug` is the public URL and doubles as the ad-campaign subdomain:
- *   slug "revenge-dressing" -> jodysplaylists.com/revenge-dressing
- *                          and revenge-dressing.jodysplaylists.com
+ *   slug "revenge-dressing" -> violetelixir.com/revenge-dressing
+ *                          and revenge-dressing.violetelixir.com
  * Keep slugs short, lowercase, hyphenated, and PERMANENT — they end up printed
  * in ad creative, and changing one breaks every link already out in the world.
  */

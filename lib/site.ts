@@ -3,7 +3,7 @@
  * else — canonical URLs, sitemap, subdomain rewrites, share metadata — reads
  * from here.
  */
-export const SITE_DOMAIN = process.env.NEXT_PUBLIC_SITE_DOMAIN ?? "jodysplaylists.com";
+export const SITE_DOMAIN = process.env.NEXT_PUBLIC_SITE_DOMAIN ?? "violetelixir.com";
 export const SITE_URL = `https://${SITE_DOMAIN}`;
 export const SITE_NAME = "Jody's Playlists";
 /**

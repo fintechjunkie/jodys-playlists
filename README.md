@@ -114,8 +114,8 @@ Two hostnames reach every playlist:
 
 | Form | Example | Use |
 | --- | --- | --- |
-| Path (canonical) | `jodysplaylists.com/revenge-dressing` | Organic, sharing, SEO |
-| Subdomain | `revenge-dressing.jodysplaylists.com` | Ad creative |
+| Path (canonical) | `violetelixir.com/revenge-dressing` | Organic, sharing, SEO |
+| Subdomain | `revenge-dressing.violetelixir.com` | Ad creative |
 
 The subdomain is handled by [`proxy.ts`](proxy.ts), which rewrites
 `<slug>.<domain>/` to `/<slug>`. A **single wildcard DNS record covers every
@@ -138,14 +138,14 @@ CNAME  www    cname.vercel-dns.com
 CNAME  *      cname.vercel-dns.com # every playlist subdomain
 ```
 
-Then in Vercel → Project → Settings → Domains, add `jodysplaylists.com`,
-`www.jodysplaylists.com`, and `*.jodysplaylists.com`. Confirm the wildcard is
+Then in Vercel → Project → Settings → Domains, add `violetelixir.com`,
+`www.violetelixir.com`, and `*.violetelixir.com`. Confirm the wildcard is
 available on your Vercel plan; if it is not, add subdomains individually for
 just the playlists you are actively advertising — the proxy handles both cases
 identically.
 
 Set `NEXT_PUBLIC_SITE_DOMAIN` in Vercel's environment variables to the real
-domain. It defaults to `jodysplaylists.com` (see [`lib/site.ts`](lib/site.ts)).
+domain. It defaults to `violetelixir.com` (see [`lib/site.ts`](lib/site.ts)).
 
 ## Playback and saving
 
