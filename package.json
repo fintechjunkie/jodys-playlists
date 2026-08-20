@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "covers": "node --no-warnings=MODULE_TYPELESS_PACKAGE_JSON scripts/make-covers.mjs",
-    "pins": "node --no-warnings=MODULE_TYPELESS_PACKAGE_JSON scripts/make-pins.mjs"
+    "pins": "node --no-warnings=MODULE_TYPELESS_PACKAGE_JSON scripts/make-pins.mjs",
+    "icons": "node --no-warnings=MODULE_TYPELESS_PACKAGE_JSON scripts/make-icons.mjs"
   },
   "dependencies": {
     "next": "16.3.1",
