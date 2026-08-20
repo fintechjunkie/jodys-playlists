@@ -1,0 +1,18 @@
+<!--
+  Browser tab mark. Same magenta circle and same bolt path as the home link in
+  CornerNav, so the tab and the on-page mark cannot drift apart.
+
+  The bolt is set far larger in the frame than it is in CornerNav (where it is a
+  20px glyph in a 50px circle). At 16px a proportionally small bolt reads as a
+  smudge, so here it fills the circle almost edge to edge.
+
+  Colours are the literal token values from globals.css: lipstick-magenta and
+  warm-chalk. Hard-coded because an SVG served as a static file cannot see the
+  Tailwind theme -- if those tokens ever change, change them here too.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <circle cx="16" cy="16" r="16" fill="#db3c8a" />
+  <g transform="translate(1.625 1) scale(1.25)">
+    <path d="M13.5 2 4 14h6l-1.5 8L19 9h-6.5z" fill="#fff8f6" />
+  </g>
+</svg>
