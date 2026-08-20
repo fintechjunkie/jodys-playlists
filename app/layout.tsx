@@ -13,6 +13,11 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: { default: `${SITE_NAME} — ${SITE_TAGLINE}`, template: `%s — ${SITE_NAME}` },
   description: "Hand-sequenced playlists. Each one built as a set of acts, dusk to after midnight.",
+  // The apex is canonical. Every playlist page sets its own, but the home page
+  // had none, so the apex and www served identical untagged copies and nothing
+  // said which one was real. Vercel redirects www here as well; this is the half
+  // that keeps working if that redirect is ever removed.
+  alternates: { canonical: "/" },
   openGraph: { siteName: SITE_NAME, type: "website" },
   twitter: { card: "summary_large_image" },
 };
