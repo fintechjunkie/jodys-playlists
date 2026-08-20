@@ -51,8 +51,8 @@ export const CREATOR = {
   name: "Jody Lynn",
   role: "Songwriter, and the artist behind several tracks on every list",
   paragraphs: [
-    "Songwriter in a lyrical life with a voice like sugar-coated barbwire. Pouring it all out, surrendering to my cathexis while serving up a little ear candy for ya! ;)",
-    "These playlists are that same habit pointed outward — made for the love of the music, and sequenced in acts so they play like a night instead of a shuffle. A few of my own songs sit in every one.",
+    "Multi-genre Songwriter in a lyrical life with a voice like sugar-coated barbwire. Pouring it all out while serving up nonstop new songs as a little ear candy.",
+    "These playlists are that same habit pointed outward. They're made for the love of the music, and sequenced in acts so they fill up a night with no need to shuffle. A few of my own songs sit in every one.",
   ],
   // The ?si= share-tracking parameter is stripped deliberately: it identifies
   // the person who copied the link, and there's no reason to attach that to
