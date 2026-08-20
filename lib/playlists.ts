@@ -378,7 +378,7 @@ export const playlists: Playlist[] = [
         number: "III",
         title: "Too Loud, Too Fast",
         tracks: [
-          { artist: "Jody Lynn", title: "Different Story" },
+          { artist: "Jody Lynn", title: "Just Curious" },
           { artist: "Taking Back Sunday", title: "MakeDamnSure" },
           { artist: "Yellowcard", title: "Ocean Avenue" },
           { artist: "The Used", title: "The Taste of Ink" },
